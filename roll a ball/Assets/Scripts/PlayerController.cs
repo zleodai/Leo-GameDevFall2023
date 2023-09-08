@@ -9,11 +9,14 @@ public class PlayerController : MonoBehaviour
     public float speed = 0;
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
+    public InputAction playerControls;
 
     private Rigidbody rb;
     private int count;
     private float movementX;
     private float movementY;
+    private float jumpValue;
+    private boolean isGrounded;
 
     void Start()
     {
@@ -21,6 +24,16 @@ public class PlayerController : MonoBehaviour
         count = 0;
         SetCountText();
         winTextObject.SetActive(false);
+    }
+
+    private void OnEnable()
+    {
+        playerControls.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerControls.Disable();
     }
 
     void OnMove(InputValue movementValue)
@@ -39,9 +52,14 @@ public class PlayerController : MonoBehaviour
             winTextObject.SetActive(true);
         }
     }    
+
+    void Update()
+    {
+        jumpValue = playerControls.ReadValue<float>();
+    }
     void FixedUpdate()
     {
-        Vector3 movement = new Vector3(movementX, 0.0f, movementY);
+        Vector3 movement = new Vector3(movementX, jumpValue, movementY);
 
         rb.AddForce(movement * speed);
     }
@@ -55,5 +73,6 @@ public class PlayerController : MonoBehaviour
 
             SetCountText();
         }
+        if(other.gameObject)
     }
 }

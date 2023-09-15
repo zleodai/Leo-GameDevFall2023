@@ -9,14 +9,15 @@ public class PlayerController : MonoBehaviour
     public float speed = 0;
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
-    public InputAction playerControls;
 
     private Rigidbody rb;
     private int count;
     private float movementX;
     private float movementY;
+
+
     private float jumpValue;
-    private boolean isGrounded;
+    private bool isGrounded;
 
     void Start()
     {
@@ -24,24 +25,24 @@ public class PlayerController : MonoBehaviour
         count = 0;
         SetCountText();
         winTextObject.SetActive(false);
+        jumpValue = 5f;
     }
 
-    private void OnEnable()
-    {
-        playerControls.Enable();
-    }
-
-    private void OnDisable()
-    {
-        playerControls.Disable();
-    }
-
-    void OnMove(InputValue movementValue)
+    public void OnMove(InputValue movementValue)
     {
         Vector2 movementVector = movementValue.Get<Vector2>();
 
         movementX = movementVector.x;
         movementY = movementVector.y;
+    }
+
+    public void Jump()
+    {
+        Debug.Log("Jump");
+        if (isGrounded)
+        {
+            rb.AddForce(Vector3.up * jumpValue, ForceMode.Impulse);
+        }
     }
 
     void SetCountText()
@@ -53,13 +54,9 @@ public class PlayerController : MonoBehaviour
         }
     }    
 
-    void Update()
-    {
-        jumpValue = playerControls.ReadValue<float>();
-    }
     void FixedUpdate()
     {
-        Vector3 movement = new Vector3(movementX, jumpValue, movementY);
+        Vector3 movement = new Vector3(movementX, 0.0f, movementY);
 
         rb.AddForce(movement * speed);
     }
@@ -73,6 +70,18 @@ public class PlayerController : MonoBehaviour
 
             SetCountText();
         }
-        if(other.gameObject)
+        if(other.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.gameObject.CompareTag("Ground"))
+        {
+            Debug.Log("hi");
+            isGrounded = false;
+        }
     }
 }

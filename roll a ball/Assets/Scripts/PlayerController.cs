@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
     //For Singleton
     public static PlayerController instance = null;
 
+    //Camera Singleton
+    public CameraController cameraController;
+
     //Components
     private Rigidbody rb;
     private Transform objTransform;
@@ -23,9 +26,12 @@ public class PlayerController : MonoBehaviour
     private float speed;
 
     //For Camera Movement
-    public float viewSensitivity;
-    public Vector2 mouseChangeVector;
-    public float viewY;
+    public Vector2 deltaLook;
+
+    //For GameWinCondition
+    private int PickUps;
+    public TextMeshProUGUI ScoreText;
+    public TextMeshProUGUI WinSign;
 
     private void Awake()
     {
@@ -39,20 +45,26 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         objTransform = GetComponent<Transform>();
 
-        //Player Input Sys em
+        //Player Input Intialize and Jump
         playerInputActions = new InputActions();
         playerInputActions.Player.Enable();
         playerInputActions.Player.Jump.performed += Jump;
 
         //For Jump Height
-        jumpValue = 8f;
+        jumpValue = 10f;
 
         //For speed of movement
         speed = 1f;
 
-        //For View Sensitivity
-        viewSensitivity = 5f;
-        viewY = 0f;
+        PickUps = 0;
+    }
+
+    private void Start()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        WinSign.gameObject.SetActive(false);
     }
 
     private void Jump(InputAction.CallbackContext context)
@@ -62,32 +74,95 @@ public class PlayerController : MonoBehaviour
             if (isGrounded)
             {
                 rb.AddForce(Vector3.up * jumpValue, ForceMode.VelocityChange);
-                Debug.Log("jumped");
+                //Debug.Log("jumped");
             }
         }
     }
 
-    private void FixedUpdate()
+    private Vector2 movementHelper(float yAngle, Vector2 inputVector)
     {
-        if (isGrounded)
+        Vector2 outputVector = new Vector2();
+
+        float hyp = Mathf.Sqrt(MathF.Pow(inputVector.y, 2) + Mathf.Pow(inputVector.x, 2));
+        float inputAngle;
+
+        //Idk why something to do with quadrants or someshit but it works for now
+        if (inputVector.x == 0)
         {
-            //Movement when grounded 
-            Vector2 inputVector = playerInputActions.Player.Movement.ReadValue<Vector2>();
-            rb.AddForce(new Vector3(inputVector.x, 0.0f, inputVector.y) * speed, ForceMode.Impulse);
-        } else
+            inputAngle = Mathf.Asin(inputVector.y / hyp) * 57.2958f;
+        }
+        else
         {
-            //Movement when in air (reduced speed)
-            Vector2 inputVector = playerInputActions.Player.Movement.ReadValue<Vector2>();
-            rb.AddForce(new Vector3(inputVector.x, 0.0f, inputVector.y) * speed *1/3, ForceMode.Impulse);
+            inputAngle = Mathf.Acos(inputVector.x / hyp) * 57.2958f;
         }
 
-        mouseChangeVector = playerInputActions.Player.Look.ReadValue<Vector2>();
-        viewY += mouseChangeVector.x * viewSensitivity;
+        float forceAngle = yAngle + inputAngle;
 
-        Vector3 rotationalChange = new Vector3(0f, viewY, 0f) * Time.deltaTime * viewSensitivity;
-        Quaternion rotationChange = new Quaternion();
-        rotationChange.eulerAngles = rotationalChange;
-        objTransform.rotation = rotationChange;
+        //Debug.Log("Angle: " + forceAngle);
+        //Debug.Log("inputY: " + inputVector.y + ", inputX: " + inputVector.x);
+
+        outputVector.y = hyp * Mathf.Sin(forceAngle * 0.0174533f);
+        outputVector.x = hyp * Mathf.Cos(forceAngle * 0.0174533f);
+
+        //Debug.Log("Sin: " + Mathf.Sin(forceAngle * 0.0174533f) + ", Cos: " + Mathf.Cos(forceAngle * 0.0174533f));
+        //Debug.Log("x Force: " + outputVector.x + ", z Force: " + outputVector.y);
+
+        if (inputVector.y == 0)
+        {
+            outputVector.x = -outputVector.x;
+        }
+        else if (inputVector.x == 0)
+        {
+            outputVector.y = -outputVector.y;
+        }
+
+        return outputVector;
+    }
+
+    private void FixedUpdate()
+    {
+        Vector2 outputVector = new Vector2();
+        //Movement when grounded 
+        Vector2 inputVector = playerInputActions.Player.Movement.ReadValue<Vector2>();
+        if (Mathf.Abs(inputVector.x) > 0 || Mathf.Abs(inputVector.y) > 0)
+        {
+            float yAngle = cameraController.gameObject.transform.eulerAngles.y + 180;
+
+            if (Mathf.Abs(inputVector.x) > 0 && Mathf.Abs(inputVector.y) > 0)
+            {
+                outputVector = movementHelper(yAngle, new Vector2(inputVector.x, 0)) + movementHelper(yAngle, new Vector2(0, inputVector.y)) /Mathf.Abs(2); 
+            }
+            else
+            {
+                outputVector = movementHelper(yAngle, inputVector);
+            }
+        }
+
+        //Reduce speed if player is in air
+        if (!isGrounded)
+        {
+            speed = 0.25f;
+        }
+
+        //Because the direction decides to be fucky could have put more effort into quadrants etc but its 3:37 am I just want a quick fix
+
+        rb.AddForce(new Vector3(outputVector.x, 0.0f, outputVector.y) * speed, ForceMode.Impulse);
+        speed = 1f;
+    }
+
+    private void Update()
+    {
+        //View Angle
+        Vector2 lookChange = playerInputActions.Player.Look.ReadValue<Vector2>();
+        deltaLook.x = lookChange.x;
+        deltaLook.y = lookChange.y;
+
+        if (PickUps == 12)
+        {
+            WinSign.gameObject.SetActive(true);
+        }
+
+        ScoreText.text = "Score: " + PickUps + "/12"; 
     }
 
 
@@ -97,7 +172,7 @@ public class PlayerController : MonoBehaviour
         if(collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
-            Debug.Log("Touched Ground");
+            //Debug.Log("Touched Ground");
         }
     }
 
@@ -106,7 +181,17 @@ public class PlayerController : MonoBehaviour
         if(collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = false;
-            Debug.Log("Left Ground");
+            //Debug.Log("Left Ground");
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("PickUp"))
+        {
+            other.gameObject.SetActive(false);
+            Debug.Log("Collected");
+            PickUps += 1;
         }
     }
 }

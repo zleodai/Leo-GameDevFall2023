@@ -1,0 +1,6 @@
+Features:
+
+3d pov
+Jump 
+Movement based on direction you are looking at (took me 5 hours :(  )
+Enemy cubes that try to stop you 

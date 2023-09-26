@@ -15,7 +15,6 @@ public class PlayerController : MonoBehaviour
 
     //Components
     private Rigidbody rb;
-    private Transform objTransform;
     private InputActions playerInputActions;
 
     //For Jumping (more details in Awake()
@@ -43,7 +42,6 @@ public class PlayerController : MonoBehaviour
 
         //Components
         rb = GetComponent<Rigidbody>();
-        objTransform = GetComponent<Transform>();
 
         //Player Input Intialize and Jump
         playerInputActions = new InputActions();
@@ -83,7 +81,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector2 outputVector = new Vector2();
 
-        float hyp = Mathf.Sqrt(MathF.Pow(inputVector.y, 2) + Mathf.Pow(inputVector.x, 2));
+        float hyp = Mathf.Sqrt(Mathf.Pow(inputVector.y, 2) + Mathf.Pow(inputVector.x, 2));
         float inputAngle;
 
         //Idk why something to do with quadrants or someshit but it works for now

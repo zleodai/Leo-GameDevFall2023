@@ -12,7 +12,6 @@ public class GameManager : MonoBehaviour
 
     //Managers
     private StatusManager statusManager;
-    private PhysicsHandler physicsHandler;
 
     //Player
     private PlayerInput playerInput;
@@ -39,7 +38,6 @@ public class GameManager : MonoBehaviour
 
         //Gets Managers
         statusManager = GetComponent<StatusManager>();
-        physicsHandler = GetComponent<PhysicsHandler>();
 
         //Gets Player
         playerInput = GetComponent<PlayerInput>();

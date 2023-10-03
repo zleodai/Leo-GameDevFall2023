@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class PlayerInput : MonoBehaviour
 {
+    //Singleton 
     public static PlayerInput instance = null;
+    public StatusManager statusManager;
+    private Rigidbody rigidBody;
 
     private void Awake()
     {
@@ -12,5 +15,14 @@ public class PlayerInput : MonoBehaviour
             instance = this;
         else if (instance != this)
             Destroy(gameObject);
+
+        statusManager = GameObject.FindFirstObjectByType<StatusManager>();
+
+        rigidBody = GetComponent<Rigidbody>();
+        Debug.Log(rigidBody.gameObject.name);
+
+
     }
+
+
 }

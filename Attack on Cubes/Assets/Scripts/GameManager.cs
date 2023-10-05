@@ -13,9 +13,6 @@ public class GameManager : MonoBehaviour
     //Managers
     private StatusManager statusManager;
 
-    //Player
-    private PlayerInput playerInput;
-
     public int gameMode;
     //For now:
     //0 = Menu State
@@ -38,9 +35,6 @@ public class GameManager : MonoBehaviour
 
         //Gets Managers
         statusManager = GetComponent<StatusManager>();
-
-        //Gets Player
-        playerInput = GetComponent<PlayerInput>();
 
         //For now gamemode = 1 because i need to get the physics worked out
         gameMode = 1;

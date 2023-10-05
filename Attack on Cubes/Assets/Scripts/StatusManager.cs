@@ -14,9 +14,6 @@ public class StatusManager : MonoBehaviour
     //Managers
     private GameManager gameManager;
 
-    //Player
-    private PlayerInput playerInput;
-
     private void Awake()
     {
         if (instance == null)
@@ -26,8 +23,5 @@ public class StatusManager : MonoBehaviour
 
         //Gets Managers
         gameManager = GetComponent<GameManager>();
-
-        //Gets Player
-        playerInput = GetComponent<PlayerInput>();
     }   
 }

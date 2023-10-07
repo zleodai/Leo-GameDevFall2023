@@ -4,15 +4,28 @@ using UnityEngine;
 
 public class ThirdPersonCam : MonoBehaviour
 {
+    public static ThirdPersonCam instance = null;
+
+
     [Header("Refrences")]
     public Transform orientation;
     public Transform player;
     public Transform playerObj;
     public Rigidbody rb;
 
+    public Vector3 direction;
+
     public float rotationSpeed;
 
-    public Transform combatLookAt;  
+    public Transform combatLookAt;
+
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else if (instance != this)
+            Destroy(gameObject);
+    }
 
     private void Start()
     {
@@ -26,6 +39,7 @@ public class ThirdPersonCam : MonoBehaviour
         orientation.forward = viewDir.normalized;
 
         Vector3 dirToCombatLookAt = combatLookAt.position - new Vector3(transform.position.x, combatLookAt.position.y, transform.position.z);
+        direction = dirToCombatLookAt;
         orientation.forward = dirToCombatLookAt.normalized;
 
         playerObj.forward = dirToCombatLookAt.normalized;

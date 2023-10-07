@@ -8,6 +8,8 @@ public class PlayerMovement : MonoBehaviour
     private InputActions inputActions;
     private Rigidbody rb;
 
+    private ThirdPersonCam cameraObject;
+
     private float horizontalInput;
     private float verticalInput;
     private Vector3 moveDirection;
@@ -30,6 +32,21 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask groundLayer;
     private bool isGrounded;
 
+    [Header("Grapple")]
+    public GameObject grapplePrefab;
+    private bool engagedLeftGrapple;
+    private bool engagedRightGrapple;
+    private GameObject leftGrapple;
+    private GameObject rightGrapple;
+
+    //to check if grapple has hit an object
+    private bool leftGrappleStuck;
+    private bool rightGrappleStuck;
+
+    //Public values for debug
+    public Vector3 grappleDirection;
+    public GameObject grappleSpawnPoint;
+    public float grappleSpeed;
 
     private void Start()
     {
@@ -41,8 +58,16 @@ public class PlayerMovement : MonoBehaviour
         inputActions.Player.Movement.performed += Movement;
         inputActions.Player.Movement.canceled += MovementEnd;
         inputActions.Player.Jump.performed += Jump;
+        inputActions.Player.LeftGrapple.started += LeftGrappleEngage;
+        inputActions.Player.RightGrapple.started += RightGrappleEngage;
+        inputActions.Player.LeftGrapple.canceled += LeftGrappleDisengage;
+        inputActions.Player.RightGrapple.canceled += RightGrappleDisengage;
 
         readyToJump = true;
+
+        cameraObject = GameObject.FindFirstObjectByType<ThirdPersonCam>();
+
+        grappleSpeed = 50f;
     }
 
     private void Update()
@@ -60,6 +85,11 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
+
+        if (leftGrapple != null)
+        {
+            Rigidbody grappleRB = leftGrapple.GetComponent<Rigidbody>();
+        }
     }
 
     private void Movement(InputAction.CallbackContext context)
@@ -113,5 +143,30 @@ public class PlayerMovement : MonoBehaviour
     private void ResetJump()
     {
         readyToJump = true;
+    }
+
+    private void LeftGrappleEngage(InputAction.CallbackContext context)
+    {
+        if (!engagedLeftGrapple)
+        {
+            leftGrapple = Instantiate(grapplePrefab, grappleSpawnPoint.transform.position, transform.rotation * Quaternion.Euler(Vector3.forward * transform.rotation.y));
+            grappleDirection = Vector3.Normalize(grappleSpawnPoint.transform.position - cameraObject.gameObject.transform.position);
+            leftGrapple.GetComponent<Rigidbody>().velocity = grappleDirection * grappleSpeed;
+        }
+    }
+
+    private void RightGrappleEngage(InputAction.CallbackContext context)
+    {
+
+    }
+
+    private void LeftGrappleDisengage(InputAction.CallbackContext context)
+    {
+
+    }
+
+    private void RightGrappleDisengage(InputAction.CallbackContext context)
+    {
+
     }
 }

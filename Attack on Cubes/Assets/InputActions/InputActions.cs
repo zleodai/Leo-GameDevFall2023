@@ -53,6 +53,24 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LeftGrapple"",
+                    ""type"": ""Button"",
+                    ""id"": ""d17fe50b-05b8-4c27-ad59-832e68c30885"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightGrapple"",
+                    ""type"": ""Button"",
+                    ""id"": ""1248b2eb-fb67-4f33-8139-0d81ed0e1bea"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -130,6 +148,28 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fde73a5d-afe8-494a-8409-136d39e2eb00"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftGrapple"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""22fd8e16-301c-4fe6-9726-f82ef65ac889"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightGrapple"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -720,6 +760,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
+        m_Player_LeftGrapple = m_Player.FindAction("LeftGrapple", throwIfNotFound: true);
+        m_Player_RightGrapple = m_Player.FindAction("RightGrapple", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -796,6 +838,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Movement;
     private readonly InputAction m_Player_Look;
+    private readonly InputAction m_Player_LeftGrapple;
+    private readonly InputAction m_Player_RightGrapple;
     public struct PlayerActions
     {
         private @InputActions m_Wrapper;
@@ -803,6 +847,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Movement => m_Wrapper.m_Player_Movement;
         public InputAction @Look => m_Wrapper.m_Player_Look;
+        public InputAction @LeftGrapple => m_Wrapper.m_Player_LeftGrapple;
+        public InputAction @RightGrapple => m_Wrapper.m_Player_RightGrapple;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -821,6 +867,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @LeftGrapple.started += instance.OnLeftGrapple;
+            @LeftGrapple.performed += instance.OnLeftGrapple;
+            @LeftGrapple.canceled += instance.OnLeftGrapple;
+            @RightGrapple.started += instance.OnRightGrapple;
+            @RightGrapple.performed += instance.OnRightGrapple;
+            @RightGrapple.canceled += instance.OnRightGrapple;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -834,6 +886,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @LeftGrapple.started -= instance.OnLeftGrapple;
+            @LeftGrapple.performed -= instance.OnLeftGrapple;
+            @LeftGrapple.canceled -= instance.OnLeftGrapple;
+            @RightGrapple.started -= instance.OnRightGrapple;
+            @RightGrapple.performed -= instance.OnRightGrapple;
+            @RightGrapple.canceled -= instance.OnRightGrapple;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1019,6 +1077,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnMovement(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnLeftGrapple(InputAction.CallbackContext context);
+        void OnRightGrapple(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

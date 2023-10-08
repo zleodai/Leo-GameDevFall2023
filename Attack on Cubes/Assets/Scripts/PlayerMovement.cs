@@ -5,8 +5,11 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public static PlayerMovement instance = null;
+
     private InputActions inputActions;
     private Rigidbody rb;
+    private GrapplingMovment grappleMovement;
 
     private ThirdPersonCam cameraObject;
 
@@ -48,6 +51,14 @@ public class PlayerMovement : MonoBehaviour
     public GameObject grappleSpawnPoint;
     public float grappleSpeed;
 
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else if (instance != this)
+            Destroy(gameObject);
+    }
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -66,6 +77,7 @@ public class PlayerMovement : MonoBehaviour
         readyToJump = true;
 
         cameraObject = GameObject.FindFirstObjectByType<ThirdPersonCam>();
+        grappleMovement = GameObject.FindFirstObjectByType<GrapplingMovment>();
 
         grappleSpeed = 50f;
     }
@@ -147,12 +159,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void LeftGrappleEngage(InputAction.CallbackContext context)
     {
-        if (!engagedLeftGrapple)
-        {
-            leftGrapple = Instantiate(grapplePrefab, grappleSpawnPoint.transform.position, transform.rotation * Quaternion.Euler(Vector3.forward * transform.rotation.y));
-            grappleDirection = Vector3.Normalize(grappleSpawnPoint.transform.position - cameraObject.gameObject.transform.position);
-            leftGrapple.GetComponent<Rigidbody>().velocity = grappleDirection * grappleSpeed;
-        }
+        engagedLeftGrapple = true;
+        GrapplingMovment.instance.StartGrapple();
     }
 
     private void RightGrappleEngage(InputAction.CallbackContext context)
@@ -162,7 +170,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void LeftGrappleDisengage(InputAction.CallbackContext context)
     {
-
+        engagedLeftGrapple = false;
+        GrapplingMovment.instance.StopGrapple();
     }
 
     private void RightGrappleDisengage(InputAction.CallbackContext context)

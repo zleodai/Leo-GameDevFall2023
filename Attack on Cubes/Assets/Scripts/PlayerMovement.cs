@@ -421,7 +421,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 swingMovement.OdmLeftBurst();
                 leftTappedOnce = false;
-            }
+            }   
             else
             {
                 leftTappedOnce = true;
@@ -467,7 +467,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         odmForwardActive = false;
-        swingMovement.odmLeft = false;
+        swingMovement.odmForward = false;
     }
 
     private float odmBackwardCounter;
@@ -506,6 +506,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         odmBackwardActive = false;
-        swingMovement.odmLeft = false;
+        swingMovement.odmBackward = false;
     }
 }

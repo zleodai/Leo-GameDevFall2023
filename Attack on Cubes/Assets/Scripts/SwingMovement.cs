@@ -39,6 +39,7 @@ public class SwingMovement : MonoBehaviour
     public float extendCableSpeed;
     public float heldMult;
     public float burstMult;
+    public float noHookMult;
 
     public bool odmRight, odmLeft, odmForward, odmBackward, odmShorten;
     private bool swinging;
@@ -166,15 +167,27 @@ public class SwingMovement : MonoBehaviour
 
     public void OdmGearMovement()
     {
+        float tempHorizontalThrustForce = horizontalThrustForce;
+        float tempForwardThrustForce = forwardThrustForce;
+
+        if (!swinging || joint == null)
+        {
+            horizontalThrustForce *= noHookMult;
+            forwardThrustForce *= noHookMult;
+        }
+
+        if (odmRight) rb.AddForce(cam.right * horizontalThrustForce * heldMult * Time.deltaTime);
+
+        if (odmLeft) rb.AddForce(-cam.right * horizontalThrustForce * heldMult * Time.deltaTime);
+
+        if (odmForward) rb.AddForce(cam.forward * forwardThrustForce * heldMult * Time.deltaTime);
+
+        if (odmBackward) rb.AddForce(-cam.forward * forwardThrustForce * heldMult * Time.deltaTime);
+
+        horizontalThrustForce = tempHorizontalThrustForce;
+        forwardThrustForce = tempForwardThrustForce;
+
         if (!swinging || joint == null) return;
-
-        if (odmRight) rb.AddForce(orientation.right * horizontalThrustForce * heldMult * Time.deltaTime);
-
-        if (odmLeft) rb.AddForce(-orientation.right * horizontalThrustForce * heldMult * Time.deltaTime);
-
-        if (odmForward) rb.AddForce(orientation.forward * forwardThrustForce * heldMult * Time.deltaTime);
-
-        if (odmBackward) rb.AddForce(-orientation.forward * forwardThrustForce * heldMult * Time.deltaTime);
 
         if (odmShorten)
         {
@@ -191,24 +204,24 @@ public class SwingMovement : MonoBehaviour
     public void OdmRightBurst()
     {
         if (!swinging || joint == null) return;
-        rb.velocity = orientation.right * horizontalThrustForce * burstMult;
+        rb.velocity = cam.right * horizontalThrustForce * burstMult;
     }
 
     public void OdmLeftBurst()
     {
         if (!swinging || joint == null) return;
-        rb.velocity = -orientation.right * horizontalThrustForce * burstMult;
+        rb.velocity = -cam.right * horizontalThrustForce * burstMult;
     }
 
     public void OdmForwardtBurst()
     {
         if (!swinging || joint == null) return;
-        rb.velocity = orientation.forward * horizontalThrustForce * burstMult;
+        rb.velocity = cam.forward * horizontalThrustForce * burstMult;
     }
 
     public void OdmBackwardBurst()
     {
         if (!swinging || joint == null) return;
-        rb.velocity = -orientation.forward * horizontalThrustForce * burstMult;
+        rb.velocity = -cam.forward * horizontalThrustForce * burstMult;
     }
 }

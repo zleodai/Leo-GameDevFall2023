@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
 
     private InputActions inputActions;
     private Rigidbody rb;
-    private GrapplingMovment grappleMovement;
+    private SwingMovement swingMovement;
     private GameObject playerObject;
 
     private float horizontalInput;
@@ -25,19 +25,26 @@ public class PlayerMovement : MonoBehaviour
         freeze,
         walking,
         spriting,
-        air
+        air,
+        swinging
     }
+
+    [Header("Debugging")]
+    private Vector3 startPos;
 
     [Header("Bools")]
 
     public bool freeze;
     private bool sprintPressed;
-    public bool activeGrapple;
+    public bool swinging;
+    public bool inAir;
 
     [Header("Movement")]
     private float moveSpeed;
     public float walkSpeed;
     public float sprintSpeed;
+    public float swingSpeed;
+    public float airSpeed;
 
     public float groundDrag;
 
@@ -55,22 +62,6 @@ public class PlayerMovement : MonoBehaviour
     public float maxSlopeAngle;
     private RaycastHit slopeHit;
     private bool exitingSlope;
-
-    [Header("Grapple")]
-    public GameObject grapplePrefab;
-    private bool engagedLeftGrapple;
-    private bool engagedRightGrapple;
-    private GameObject leftGrapple;
-    private GameObject rightGrapple;
-
-    //to check if grapple has hit an object
-    private bool leftGrappleStuck;
-    private bool rightGrappleStuck;
-
-    //Public values for debug
-    public Vector3 grappleDirection;
-    public GameObject grappleSpawnPoint;
-    public float grappleSpeed;
 
     private void Awake()
     {
@@ -99,18 +90,22 @@ public class PlayerMovement : MonoBehaviour
         inputActions.Player.LeftGrapple.canceled += LeftGrappleDisengage;
         inputActions.Player.RightGrapple.canceled += RightGrappleDisengage;
 
+        inputActions.Player.Movement.started += OdmMovementEnter;
+        inputActions.Player.Movement.canceled += OdmMovementExit;
+        inputActions.Player.Jump.started += OdmShortenEnter;
+        inputActions.Player.Jump.canceled += OdmShortenExit;
+
         readyToJump = true;
 
-        grappleMovement = GameObject.FindFirstObjectByType<GrapplingMovment>();
-
-        grappleSpeed = 50f;
+        swingMovement = GameObject.FindFirstObjectByType<SwingMovement>();
+        startPos = transform.position;
     }
 
     private void Update()
     {
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundLayer);
 
-        if (isGrounded && !activeGrapple)
+        if (isGrounded)
             rb.drag = groundDrag;
         else
             rb.drag = 0;
@@ -124,11 +119,6 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
-
-        if (leftGrapple != null)
-        {
-            Rigidbody grappleRB = leftGrapple.GetComponent<Rigidbody>();
-        }
     }
 
     private void Movement(InputAction.CallbackContext context)
@@ -165,10 +155,21 @@ public class PlayerMovement : MonoBehaviour
         {
             state = MovementState.spriting;
             moveSpeed = sprintSpeed;
+            inAir = false;
         } else if (isGrounded)
         {
             state = MovementState.walking;
             moveSpeed = walkSpeed;
+            inAir = false;
+        } else if (swinging)
+        {
+            state = MovementState.swinging;
+            moveSpeed = swingSpeed;
+            inAir = false;
+        } else if (inAir)
+        {
+            state = MovementState.air;
+            moveSpeed = airSpeed;
         }
 
         else
@@ -180,7 +181,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
-        if (activeGrapple) return;
+        if (swinging) return;
+        if (inAir) return;
 
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
@@ -205,7 +207,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void SpeedControl()
     {
-        if (activeGrapple) return;
+        if (swinging) return;
+        if (inAir) return;
 
         if (OnSlope()&& !exitingSlope)
         {
@@ -280,16 +283,6 @@ public class PlayerMovement : MonoBehaviour
 
     private bool enableMovementOnNextTouch;
 
-    public void JumpToPosition(Vector3 targetPosition, float trajectoryHeight)
-    {
-        activeGrapple = true;
-
-        velocityToSet = CalculateJumpVelocity(transform.position, targetPosition, trajectoryHeight);
-        Invoke(nameof(SetVelocity), 0.1f);
-
-        Invoke(nameof(ResetRestrictions), 3f);
-    } 
-
     private Vector3 velocityToSet;
     private void SetVelocity()
     {
@@ -300,7 +293,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void ResetRestrictions()
     {
-        activeGrapple = false;
+        swinging = false;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -310,31 +303,101 @@ public class PlayerMovement : MonoBehaviour
             enableMovementOnNextTouch = false;
             ResetRestrictions();
 
-            grappleMovement.StopGrapple();
+            SwingMovement.instance.StopSwing();
         }
     }
 
     private void LeftGrappleEngage(InputAction.CallbackContext context)
     {
-        engagedLeftGrapple = true;
-        GrapplingMovment.instance.StartGrapple();
-        Debug.Log("Engaged");
+        swingMovement.StartSwing();
     }
 
     private void RightGrappleEngage(InputAction.CallbackContext context)
     {
-
+        transform.position = startPos;
     }
 
     private void LeftGrappleDisengage(InputAction.CallbackContext context)
     {
-        engagedLeftGrapple = false;
-        GrapplingMovment.instance.StopGrapple();
-        Debug.Log("Disengaged");
+        swingMovement.StopSwing();
     }
 
     private void RightGrappleDisengage(InputAction.CallbackContext context)
     {
 
+    }
+
+    private void OdmMovementEnter(InputAction.CallbackContext context)
+    {
+        if (swinging)
+        {
+            if (horizontalInput > 0 && verticalInput == 0)
+            {
+                if (horizontalInput > 0)
+                {
+                    swingMovement.odmRight = true;
+                }
+                else
+                {
+                    swingMovement.odmLeft = true;
+                }
+            }
+            else if (verticalInput > 0 && horizontalInput == 0)
+            {
+                if (verticalInput > 0)
+                {
+                    swingMovement.odmForward = true;
+                }
+                else
+                {
+                    swingMovement.odmBackward = true;
+                }
+            }
+        }
+    }
+
+    private void OdmMovementExit(InputAction.CallbackContext context)
+    {
+        if (swinging)
+        {
+            if (horizontalInput > 0 && verticalInput == 0)
+            {
+                if (horizontalInput > 0)
+                {
+                    swingMovement.odmRight = false;
+                }
+                else
+                {
+                    swingMovement.odmLeft = false;
+                }
+            }
+            else if (verticalInput > 0 && horizontalInput == 0)
+            {
+                if (verticalInput > 0)
+                {
+                    swingMovement.odmForward = false;
+                }
+                else
+                {
+                    swingMovement.odmBackward = false;
+                }
+            }
+        }
+    }
+
+    private void OdmShortenEnter(InputAction.CallbackContext context)
+    {
+        if (swinging)
+        {
+            swingMovement.odmShorten = true;
+        }
+    }
+
+    private void OdmShortenExit(InputAction.CallbackContext context)
+    {
+        if (swinging)
+        {
+            swingMovement.odmShorten = false;
+        }
     }
 }

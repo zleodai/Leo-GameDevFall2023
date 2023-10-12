@@ -80,6 +80,42 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OdmLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f09e712-a8c5-441a-ba0a-b15e5378a69f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OdmRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""04bf63c8-3f61-4720-b9d8-2c23182a3d7c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OdmForward"",
+                    ""type"": ""Button"",
+                    ""id"": ""962845fa-18cf-4c5d-bc87-cedeec18cebb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OdmBackward"",
+                    ""type"": ""Button"",
+                    ""id"": ""b8a71e96-fed0-4f6e-bca2-f35c977f318e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -190,6 +226,50 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5a03f79c-b041-4315-b4e5-6f600cd44ec1"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OdmLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1606aa09-12c0-4e80-b496-451bf1c1ef42"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OdmRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2d3e5bbc-f444-4811-b1cd-2685d8815fe4"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OdmForward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""85c98384-212c-4746-9e22-b1bcd59b3092"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OdmBackward"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -783,6 +863,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Player_LeftGrapple = m_Player.FindAction("LeftGrapple", throwIfNotFound: true);
         m_Player_RightGrapple = m_Player.FindAction("RightGrapple", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+        m_Player_OdmLeft = m_Player.FindAction("OdmLeft", throwIfNotFound: true);
+        m_Player_OdmRight = m_Player.FindAction("OdmRight", throwIfNotFound: true);
+        m_Player_OdmForward = m_Player.FindAction("OdmForward", throwIfNotFound: true);
+        m_Player_OdmBackward = m_Player.FindAction("OdmBackward", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -862,6 +946,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_LeftGrapple;
     private readonly InputAction m_Player_RightGrapple;
     private readonly InputAction m_Player_Sprint;
+    private readonly InputAction m_Player_OdmLeft;
+    private readonly InputAction m_Player_OdmRight;
+    private readonly InputAction m_Player_OdmForward;
+    private readonly InputAction m_Player_OdmBackward;
     public struct PlayerActions
     {
         private @InputActions m_Wrapper;
@@ -872,6 +960,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         public InputAction @LeftGrapple => m_Wrapper.m_Player_LeftGrapple;
         public InputAction @RightGrapple => m_Wrapper.m_Player_RightGrapple;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+        public InputAction @OdmLeft => m_Wrapper.m_Player_OdmLeft;
+        public InputAction @OdmRight => m_Wrapper.m_Player_OdmRight;
+        public InputAction @OdmForward => m_Wrapper.m_Player_OdmForward;
+        public InputAction @OdmBackward => m_Wrapper.m_Player_OdmBackward;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -899,6 +991,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
+            @OdmLeft.started += instance.OnOdmLeft;
+            @OdmLeft.performed += instance.OnOdmLeft;
+            @OdmLeft.canceled += instance.OnOdmLeft;
+            @OdmRight.started += instance.OnOdmRight;
+            @OdmRight.performed += instance.OnOdmRight;
+            @OdmRight.canceled += instance.OnOdmRight;
+            @OdmForward.started += instance.OnOdmForward;
+            @OdmForward.performed += instance.OnOdmForward;
+            @OdmForward.canceled += instance.OnOdmForward;
+            @OdmBackward.started += instance.OnOdmBackward;
+            @OdmBackward.performed += instance.OnOdmBackward;
+            @OdmBackward.canceled += instance.OnOdmBackward;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -921,6 +1025,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
+            @OdmLeft.started -= instance.OnOdmLeft;
+            @OdmLeft.performed -= instance.OnOdmLeft;
+            @OdmLeft.canceled -= instance.OnOdmLeft;
+            @OdmRight.started -= instance.OnOdmRight;
+            @OdmRight.performed -= instance.OnOdmRight;
+            @OdmRight.canceled -= instance.OnOdmRight;
+            @OdmForward.started -= instance.OnOdmForward;
+            @OdmForward.performed -= instance.OnOdmForward;
+            @OdmForward.canceled -= instance.OnOdmForward;
+            @OdmBackward.started -= instance.OnOdmBackward;
+            @OdmBackward.performed -= instance.OnOdmBackward;
+            @OdmBackward.canceled -= instance.OnOdmBackward;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1109,6 +1225,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnLeftGrapple(InputAction.CallbackContext context);
         void OnRightGrapple(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
+        void OnOdmLeft(InputAction.CallbackContext context);
+        void OnOdmRight(InputAction.CallbackContext context);
+        void OnOdmForward(InputAction.CallbackContext context);
+        void OnOdmBackward(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

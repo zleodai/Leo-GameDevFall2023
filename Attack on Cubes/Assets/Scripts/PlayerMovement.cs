@@ -51,7 +51,9 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce;
     public float jumpCooldown;
     public float airMultiplier;
-    private bool readyToJump; 
+    private bool readyToJump;
+
+    public float doubleTapDelay;
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -90,10 +92,29 @@ public class PlayerMovement : MonoBehaviour
         inputActions.Player.LeftGrapple.canceled += LeftGrappleDisengage;
         inputActions.Player.RightGrapple.canceled += RightGrappleDisengage;
 
-        inputActions.Player.Movement.started += OdmMovementEnter;
-        inputActions.Player.Movement.canceled += OdmMovementExit;
-        inputActions.Player.Jump.started += OdmShortenEnter;
-        inputActions.Player.Jump.canceled += OdmShortenExit;
+        //inputActions.Player.OdmLeft.started += ctx => swingMovement.odmLeft = true;
+        //inputActions.Player.OdmRight.started += ctx => swingMovement.odmRight = true;
+        //inputActions.Player.OdmForward.started += ctx => swingMovement.odmForward = true;
+        //inputActions.Player.OdmBackward.started += ctx => swingMovement.odmBackward = true;
+        //inputActions.Player.OdmLeft.canceled += ctx => swingMovement.odmLeft = false;
+        //inputActions.Player.OdmRight.canceled += ctx => swingMovement.odmRight = false;
+        //inputActions.Player.OdmForward.canceled += ctx => swingMovement.odmForward = false;
+        //inputActions.Player.OdmBackward.canceled += ctx => swingMovement.odmBackward = false;
+
+        inputActions.Player.OdmRight.started += OdmRightStart;
+        inputActions.Player.OdmRight.canceled += OdmRightCanceled;
+
+        inputActions.Player.OdmLeft.started += OdmLeftStart;
+        inputActions.Player.OdmLeft.canceled += OdmLeftCanceled;
+
+        inputActions.Player.OdmForward.started += OdmForwardStart;
+        inputActions.Player.OdmForward.canceled += OdmForwardCanceled;
+
+        inputActions.Player.OdmBackward.started += OdmBackwardStart;
+        inputActions.Player.OdmBackward.canceled += OdmBackwardCanceled;
+
+        inputActions.Player.Jump.started += ctx => swingMovement.odmShorten = true;
+        inputActions.Player.Jump.canceled += ctx => swingMovement.odmShorten = false;
 
         readyToJump = true;
 
@@ -114,6 +135,11 @@ public class PlayerMovement : MonoBehaviour
         StateHandeler();
 
         playerObject.transform.rotation = orientation.transform.rotation;
+
+        if (odmLeftActive) OdmLeftActive();
+        if (odmRightActive) OdmRightActive();
+        if (odmForwardActive) OdmForwardActive();
+        if (odmBackwardActive) OdmBackwardActive();
     }
 
     private void FixedUpdate()
@@ -327,77 +353,159 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    private void OdmMovementEnter(InputAction.CallbackContext context)
+    private float odmRightCounter;
+    private bool odmRightActive;
+    private bool rightTappedOnce;
+
+    private void OdmRightStart(InputAction.CallbackContext context)
     {
-        if (swinging)
+        odmRightCounter = 0f;
+        odmRightActive = true;
+        swingMovement.odmRight = false;
+    }
+
+    private void OdmRightActive()
+    {
+        odmRightCounter += Time.deltaTime;
+        if (odmRightCounter > doubleTapDelay)
         {
-            if (horizontalInput > 0 && verticalInput == 0)
-            {
-                if (horizontalInput > 0)
-                {
-                    swingMovement.odmRight = true;
-                }
-                else
-                {
-                    swingMovement.odmLeft = true;
-                }
-            }
-            else if (verticalInput > 0 && horizontalInput == 0)
-            {
-                if (verticalInput > 0)
-                {
-                    swingMovement.odmForward = true;
-                }
-                else
-                {
-                    swingMovement.odmBackward = true;
-                }
-            }
+            rightTappedOnce = false;
+            swingMovement.odmRight = true;
         }
     }
 
-    private void OdmMovementExit(InputAction.CallbackContext context)
+    private void OdmRightCanceled(InputAction.CallbackContext context)
     {
-        if (swinging)
+        if (odmRightCounter < doubleTapDelay)
         {
-            if (horizontalInput > 0 && verticalInput == 0)
+            if (rightTappedOnce)
             {
-                if (horizontalInput > 0)
-                {
-                    swingMovement.odmRight = false;
-                }
-                else
-                {
-                    swingMovement.odmLeft = false;
-                }
+                swingMovement.OdmRightBurst();
+                rightTappedOnce = false;
             }
-            else if (verticalInput > 0 && horizontalInput == 0)
+            else
             {
-                if (verticalInput > 0)
-                {
-                    swingMovement.odmForward = false;
-                }
-                else
-                {
-                    swingMovement.odmBackward = false;
-                }
+                rightTappedOnce = true;
             }
+        }
+        odmRightActive = false;
+        swingMovement.odmRight = false;
+    }
+
+    private float odmLeftCounter;
+    private bool odmLeftActive;
+    private bool leftTappedOnce;
+
+    private void OdmLeftStart(InputAction.CallbackContext context)
+    {
+        odmLeftCounter = 0f;
+        odmLeftActive = true;
+        swingMovement.odmLeft = false;
+    }
+
+    private void OdmLeftActive()
+    {
+        odmLeftCounter += Time.deltaTime;
+        if (odmLeftCounter > doubleTapDelay)
+        {
+            leftTappedOnce = false;
+            swingMovement.odmLeft = true;
         }
     }
 
-    private void OdmShortenEnter(InputAction.CallbackContext context)
+    private void OdmLeftCanceled(InputAction.CallbackContext context)
     {
-        if (swinging)
+        if (odmLeftCounter < doubleTapDelay)
         {
-            swingMovement.odmShorten = true;
+            if (leftTappedOnce)
+            {
+                swingMovement.OdmLeftBurst();
+                leftTappedOnce = false;
+            }
+            else
+            {
+                leftTappedOnce = true;
+            }
+        }
+        odmLeftActive = false;
+        swingMovement.odmLeft = false;
+    }
+
+    private float odmForwardCounter;
+    private bool odmForwardActive;
+    private bool forwardTappedOnce;
+
+    private void OdmForwardStart(InputAction.CallbackContext context)
+    {
+        odmForwardCounter = 0f;
+        odmForwardActive = true;
+        swingMovement.odmForward = false;
+    }
+
+    private void OdmForwardActive()
+    {
+        odmForwardCounter += Time.deltaTime;
+        if (odmForwardCounter > doubleTapDelay)
+        {
+            forwardTappedOnce = false;
+            swingMovement.odmForward = true;
         }
     }
 
-    private void OdmShortenExit(InputAction.CallbackContext context)
+    private void OdmForwardCanceled(InputAction.CallbackContext context)
     {
-        if (swinging)
+        if (odmForwardCounter < doubleTapDelay)
         {
-            swingMovement.odmShorten = false;
+            if (forwardTappedOnce)
+            {
+                swingMovement.OdmForwardtBurst();
+                forwardTappedOnce = false;
+            }
+            else
+            {
+                forwardTappedOnce = true;
+            }
         }
+        odmForwardActive = false;
+        swingMovement.odmLeft = false;
+    }
+
+    private float odmBackwardCounter;
+    private bool odmBackwardActive;
+    private bool backwardTappedOnce;
+
+    private void OdmBackwardStart(InputAction.CallbackContext context)
+    {
+        odmBackwardCounter = 0f;
+        odmBackwardActive = true;
+        swingMovement.odmBackward = false;
+    }
+
+    private void OdmBackwardActive()
+    {
+        odmBackwardCounter += Time.deltaTime;
+        if (odmBackwardCounter > doubleTapDelay)
+        {
+            backwardTappedOnce = false;
+            swingMovement.odmBackward = true;
+        }
+    }
+
+    private void OdmBackwardCanceled(InputAction.CallbackContext context)
+    {
+        if (odmBackwardCounter < doubleTapDelay)
+        {
+            if (backwardTappedOnce)
+            {
+                swingMovement.OdmBackwardBurst();
+                backwardTappedOnce = false;
+            }
+            else
+            {
+                backwardTappedOnce = true;
+            }
+        }
+        odmBackwardActive = false;
+        swingMovement.odmLeft = false;
     }
 }

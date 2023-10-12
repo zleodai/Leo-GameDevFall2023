@@ -8,7 +8,8 @@ public class SwingMovement : MonoBehaviour
 
     [Header("Refrences")]
     private LineRenderer lr;
-    public Transform gunTip, cam, player;
+    public Transform gunTip;
+    public Transform cam, player;
     public LayerMask whatIsGrappleable;
     public PlayerMovement playerMovement;
 
@@ -19,15 +20,16 @@ public class SwingMovement : MonoBehaviour
     public float minDistance;
     public float maxDistance;
 
-    //[Header("Grapple")]
-    //public float grappleSpeed;
-    //public float grappleStrength;
-
     [Header("Swinging")]
     public float maxSwingDistance;
     private Vector3 swingPoint;
     private SpringJoint joint;
     private Vector3 currentGrapplePosition;
+
+    [Header("Prediction")]
+    public RaycastHit predictionHit;
+    public float predictionSphereCastRadius;
+    public Transform predictionPoint;
 
     [Header("OdmGear")]
     public Transform orientation;
@@ -35,9 +37,11 @@ public class SwingMovement : MonoBehaviour
     public float horizontalThrustForce;
     public float forwardThrustForce;
     public float extendCableSpeed;
+    public float heldMult;
+    public float burstMult;
 
     public bool odmRight, odmLeft, odmForward, odmBackward, odmShorten;
-    public bool swinging;
+    private bool swinging;
 
     private void Awake()
     {
@@ -56,24 +60,11 @@ public class SwingMovement : MonoBehaviour
         odmShorten = false;
     }
 
-    //private void Update()
-    //{
-    //    if (playerMovement.swinging)
-    //    {
-    //        Vector3 moveVec = (swingPoint - player.transform.position).normalized;
-    //        moveVec += cam.transform.forward * grappleSpeed;
-    //        player.GetComponent<Rigidbody>().AddForce(moveVec * grappleStrength * Time.deltaTime, ForceMode.VelocityChange);
-
-    //        if (Vector3.Distance(transform.position, swingPoint) > maxSwingDistance)
-    //        {
-    //            StopSwing();
-    //        }
-    //    }
-    //}
-
     private void Update()
     {
         OdmGearMovement();
+        CheckForSwingPoints();
+
         swinging = playerMovement.swinging;
     }
 
@@ -84,29 +75,28 @@ public class SwingMovement : MonoBehaviour
 
     public void StartSwing()
     {
+        if (predictionHit.point == Vector3.zero) return;
+
         playerMovement.swinging = true;
-        RaycastHit hit;
-        if (Physics.Raycast(cam.position, cam.forward, out hit, maxSwingDistance, whatIsGrappleable))
-        {
-            swingPoint = hit.point;
-            joint = player.gameObject.AddComponent<SpringJoint>();
-            joint.autoConfigureConnectedAnchor = false;
-            joint.connectedAnchor = swingPoint;
-            joint.anchor = new Vector3(0, 0, 0);
-            joint.tag = "qGrapple";
 
-            float distanceFromPoint = Vector3.Distance(player.position, swingPoint);
+        swingPoint = predictionHit.point;
+        joint = player.gameObject.AddComponent<SpringJoint>();
+        joint.autoConfigureConnectedAnchor = false;
+        joint.connectedAnchor = swingPoint;
+        joint.anchor = new Vector3(0, 0, 0);
+        joint.tag = "qGrapple";
 
-            joint.maxDistance = distanceFromPoint * maxDistance;
-            joint.minDistance = distanceFromPoint * minDistance;
+        float distanceFromPoint = Vector3.Distance(player.position, swingPoint);
 
-            joint.spring = spring;
-            joint.damper = damper;
-            joint.massScale = massScale;
+        joint.maxDistance = distanceFromPoint * maxDistance;
+        joint.minDistance = distanceFromPoint * minDistance;
 
-            lr.positionCount = 2;
-            currentGrapplePosition = gunTip.position;
-        }
+        joint.spring = spring;
+        joint.damper = damper;
+        joint.massScale = massScale;
+
+        lr.positionCount = 2;
+        currentGrapplePosition = gunTip.position;
     }
 
     public void StopSwing()
@@ -122,12 +112,6 @@ public class SwingMovement : MonoBehaviour
             if(joint.tag == "qGrapple") Destroy(joint);
         }
         lr.positionCount = 0;
-
-        odmRight = false;
-        odmLeft = false;
-        odmForward = false;
-        odmBackward = false;
-        odmShorten = false;
     }
 
     public void killRope()
@@ -142,7 +126,7 @@ public class SwingMovement : MonoBehaviour
 
     private void DrawRope()
     {
-        if (!playerMovement.swinging) return;
+        if (!swinging || joint == null) return;
 
         currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
 
@@ -150,15 +134,47 @@ public class SwingMovement : MonoBehaviour
         lr.SetPosition(1, currentGrapplePosition);
     }
 
+    private void CheckForSwingPoints()
+    {
+        if (joint != null || swinging) return;
+
+        RaycastHit sphereCastHit;
+        Physics.SphereCast(cam.position, predictionSphereCastRadius, cam.forward, out sphereCastHit, maxSwingDistance, whatIsGrappleable);
+
+        RaycastHit raycastHit;
+        Physics.Raycast(cam.position, cam.forward, out raycastHit, maxSwingDistance, whatIsGrappleable);
+
+        Vector3 realHitPoint;
+
+        if (raycastHit.point != Vector3.zero) realHitPoint = raycastHit.point;
+
+        else if (sphereCastHit.point != Vector3.zero) realHitPoint = sphereCastHit.point;
+
+        else realHitPoint = Vector3.zero;
+
+        if (realHitPoint != Vector3.zero)
+        {
+            predictionPoint.gameObject.SetActive(true);
+            predictionPoint.position = realHitPoint;
+        } else
+        {
+            predictionPoint.gameObject.SetActive(false);
+        }
+
+        predictionHit = raycastHit.point == Vector3.zero ? sphereCastHit : raycastHit;
+    }
+
     public void OdmGearMovement()
     {
-        if (odmRight) rb.AddForce(orientation.right * horizontalThrustForce * Time.deltaTime);
+        if (!swinging || joint == null) return;
 
-        if (odmLeft) rb.AddForce(-orientation.right * horizontalThrustForce * Time.deltaTime);
+        if (odmRight) rb.AddForce(orientation.right * horizontalThrustForce * heldMult * Time.deltaTime);
 
-        if (odmForward) rb.AddForce(orientation.forward * forwardThrustForce * Time.deltaTime);
+        if (odmLeft) rb.AddForce(-orientation.right * horizontalThrustForce * heldMult * Time.deltaTime);
 
-        if (odmBackward) rb.AddForce(-orientation.forward * forwardThrustForce * Time.deltaTime);
+        if (odmForward) rb.AddForce(orientation.forward * forwardThrustForce * heldMult * Time.deltaTime);
+
+        if (odmBackward) rb.AddForce(-orientation.forward * forwardThrustForce * heldMult * Time.deltaTime);
 
         if (odmShorten)
         {
@@ -170,5 +186,29 @@ public class SwingMovement : MonoBehaviour
             joint.maxDistance = distanceFromPoint * maxDistance;
             joint.minDistance = distanceFromPoint * minDistance;
         }
+    }
+
+    public void OdmRightBurst()
+    {
+        if (!swinging || joint == null) return;
+        rb.velocity = orientation.right * horizontalThrustForce * burstMult;
+    }
+
+    public void OdmLeftBurst()
+    {
+        if (!swinging || joint == null) return;
+        rb.velocity = -orientation.right * horizontalThrustForce * burstMult;
+    }
+
+    public void OdmForwardtBurst()
+    {
+        if (!swinging || joint == null) return;
+        rb.velocity = orientation.forward * horizontalThrustForce * burstMult;
+    }
+
+    public void OdmBackwardBurst()
+    {
+        if (!swinging || joint == null) return;
+        rb.velocity = -orientation.forward * horizontalThrustForce * burstMult;
     }
 }

@@ -58,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Ground Check")]
     public float playerHeight;
     public LayerMask groundLayer;
-    private bool isGrounded;
+    public bool isGrounded;
 
     [Header("Slope Handling")]
     public float maxSlopeAngle;
@@ -329,28 +329,29 @@ public class PlayerMovement : MonoBehaviour
             enableMovementOnNextTouch = false;
             ResetRestrictions();
 
-            SwingMovement.instance.StopSwing();
+            SwingMovement.instance.StopSwing(0);
+            SwingMovement.instance.StopSwing(1);
         }
     }
 
     private void LeftGrappleEngage(InputAction.CallbackContext context)
     {
-        swingMovement.StartSwing();
+        swingMovement.StartSwing(0);
     }
 
     private void RightGrappleEngage(InputAction.CallbackContext context)
     {
-        transform.position = startPos;
+        swingMovement.StartSwing(1);
     }
 
     private void LeftGrappleDisengage(InputAction.CallbackContext context)
     {
-        swingMovement.StopSwing();
+        swingMovement.StopSwing(0);
     }
 
     private void RightGrappleDisengage(InputAction.CallbackContext context)
     {
-
+        swingMovement.StopSwing(1);
     }
 
     private float odmRightCounter;

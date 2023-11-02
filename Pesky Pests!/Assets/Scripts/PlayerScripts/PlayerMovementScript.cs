@@ -46,7 +46,7 @@ public class PlayerMovementScript : MonoBehaviour
         playerCollider = gameObject.transform.Find("PlayerMesh").GetComponent<CapsuleCollider>();
         playerRigidbody = gameObject.transform.Find("PlayerMesh").GetComponent<Rigidbody>();
         orientation = gameObject.transform.Find("Orientation");
-        gameManager = GameManager.instance;
+        gameManager = GameObject.FindFirstObjectByType<GameManager>();
 
         groundLayer = LayerMask.GetMask("GroundLayer");
 
@@ -68,6 +68,10 @@ public class PlayerMovementScript : MonoBehaviour
         playerInput.PlayerMovement.Space.performed += Spaceperformed;
         playerInput.PlayerMovement.Shift.started += Shiftstarted;
         playerInput.PlayerMovement.Shift.canceled += Shiftcanceled;
+
+
+        //UI Player Input
+        playerInput.UI.Esc.performed += escPressed;
     }
 
     private void Update()
@@ -78,15 +82,22 @@ public class PlayerMovementScript : MonoBehaviour
         SpeedControl();
 
         playerTransform.rotation = orientation.rotation;
-        //playerRigidbody.useGravity = !grounded;
 
         if (gameManager.gameState == GameManager.GameState.GAMEPLAY)
         {
             if (shiftPressed) movementState = MovementState.Running;
             else movementState = MovementState.Walking;
-        } else if (gameManager.gameState == GameManager.GameState.PAUSED)
+
+            Time.timeScale = 1;
+
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        } else if (gameManager.gameState == GameManager.GameState.MENU)
         {
             movementState = MovementState.Paused;
+            Time.timeScale = 0;
+            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.visible = true;
         }
     }
 
@@ -102,7 +113,7 @@ public class PlayerMovementScript : MonoBehaviour
 
     private void Spaceperformed(InputAction.CallbackContext context)
     {
-        if (grounded) playerRigidbody.AddForce(transform.up * jumpHeight);
+        if (gameManager.gameState == GameManager.GameState.GAMEPLAY && grounded) playerRigidbody.AddForce(transform.up * jumpHeight);
     }
 
     private void Shiftstarted(InputAction.CallbackContext context)
@@ -152,6 +163,20 @@ public class PlayerMovementScript : MonoBehaviour
         } else if (movementState == MovementState.Paused)
         {
 
+        }
+    }
+
+
+    //UI Interactions
+    private void escPressed(InputAction.CallbackContext context)
+    {
+        if (gameManager.gameState == GameManager.GameState.GAMEPLAY)
+        {
+            gameManager.setGameState(GameManager.GameState.MENU);
+        }
+        else if (gameManager.gameState == GameManager.GameState.MENU)
+        {
+            gameManager.setGameState(GameManager.GameState.GAMEPLAY);
         }
     }
 }

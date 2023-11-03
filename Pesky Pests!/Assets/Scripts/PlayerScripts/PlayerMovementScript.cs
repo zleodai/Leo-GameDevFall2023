@@ -54,10 +54,10 @@ public class PlayerMovementScript : MonoBehaviour
         playerHeight = 2f;
         playerJumpOffset = 0.3f;
         jumpHeight = 175f;
-        moveSpeed = 1.25f;
+        moveSpeed = 1.75f;
         airMultiplier = 1f;
         groundDrag = 0.25f;
-        runMult = 2f;
+        runMult = 2.5f;
 
         //Player Input
         playerInput = new PlayerInput();

@@ -3225,6 +3225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 874ea3fb395741b418e1ea3111a1846a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UIMask: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
   slot1Unequiped: {fileID: 21300000, guid: 9e9d70168f34a02409c979cc8408aaef, type: 3}
   slot1Equiped: {fileID: 21300000, guid: 37192bbbf1a916141b0b8ae91cabaa24, type: 3}
   slot2Unequiped: {fileID: 21300000, guid: 82c60a41c43107b409d0e087382fd402, type: 3}
@@ -7628,7 +7629,12 @@ PrefabInstance:
     - target: {fileID: 5085131375300699475, guid: 70d3721853e9704408d9fd25105ef41e,
         type: 3}
       propertyPath: m_Name
-      value: Flashlight (1)
+      value: Flashlight
+      objectReference: {fileID: 0}
+    - target: {fileID: 5085131375300699475, guid: 70d3721853e9704408d9fd25105ef41e,
+        type: 3}
+      propertyPath: m_TagString
+      value: PlayerItem
       objectReference: {fileID: 0}
     - target: {fileID: 5355745167340231480, guid: 70d3721853e9704408d9fd25105ef41e,
         type: 3}

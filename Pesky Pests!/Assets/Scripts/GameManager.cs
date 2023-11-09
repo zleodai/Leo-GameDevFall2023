@@ -4,6 +4,10 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance = null;
 
+    [Header("Refrences")]
+    private GameObject playerObject;
+    private InventoryManager playerInventoryScript;
+
     [Header("UI")]
     public GameObject EscMenu;
     public float EscMenuButtonDefaultSize;
@@ -21,12 +25,16 @@ public class GameManager : MonoBehaviour
     public GameState gameState;
 
     private void Awake()
-    {
+    {   
+        //Singleton
         if (instance == null)
             instance = this;
         else if (instance != this)
             Destroy(gameObject);
 
+        //Player
+        playerObject = GameObject.FindGameObjectWithTag("Player");
+        playerInventoryScript = playerObject.GetComponent<InventoryManager>();
 
         //UI
         if (EscMenu == null)

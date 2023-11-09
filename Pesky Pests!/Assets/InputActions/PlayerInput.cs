@@ -156,6 +156,154 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             ]
         },
         {
+            ""name"": ""PlayerActions"",
+            ""id"": ""af080c2c-c187-4160-ba53-5e988f3e808d"",
+            ""actions"": [
+                {
+                    ""name"": ""E"",
+                    ""type"": ""Button"",
+                    ""id"": ""2ea08e56-2cf1-4d5a-818f-a2e02f6ad64c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""R"",
+                    ""type"": ""Button"",
+                    ""id"": ""d15880ea-98fb-402d-a320-3d60b894ddcc"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""1"",
+                    ""type"": ""Button"",
+                    ""id"": ""2635ac7e-6885-4241-b090-71a656f58dba"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""2"",
+                    ""type"": ""Button"",
+                    ""id"": ""b34f2688-303d-424c-b555-6dd37393ba1e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""3"",
+                    ""type"": ""Button"",
+                    ""id"": ""75bf1d88-01d1-4c21-b850-101125689884"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""8af22bc1-9953-49cc-aa0c-f996ac05454c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""594b044b-6cdd-4ac8-9082-15b7f998afe3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""f0c1e388-2de9-487a-ad94-76ba58b9ab92"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""E"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""68fc6bae-83e6-42f2-be27-a2dadfb9cb46"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dab1f16e-72ac-4c34-b173-87c275b48629"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cf529716-d330-4123-a23d-9066ad0bc2f9"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f7ea659d-1a3a-4592-870d-9ea14e02c498"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1a25107d-ea24-4ff7-9264-87f3e3a3a1cb"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9dd4fb65-3c3d-4a10-9934-268b72edeb68"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""R"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
             ""name"": ""UI"",
             ""id"": ""5382ebcf-d1e3-4270-b1c2-29e7a0a02eb2"",
             ""actions"": [
@@ -192,6 +340,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_PlayerMovement_Look = m_PlayerMovement.FindAction("Look", throwIfNotFound: true);
         m_PlayerMovement_Shift = m_PlayerMovement.FindAction("Shift", throwIfNotFound: true);
         m_PlayerMovement_WASD = m_PlayerMovement.FindAction("WASD", throwIfNotFound: true);
+        // PlayerActions
+        m_PlayerActions = asset.FindActionMap("PlayerActions", throwIfNotFound: true);
+        m_PlayerActions_E = m_PlayerActions.FindAction("E", throwIfNotFound: true);
+        m_PlayerActions_R = m_PlayerActions.FindAction("R", throwIfNotFound: true);
+        m_PlayerActions__1 = m_PlayerActions.FindAction("1", throwIfNotFound: true);
+        m_PlayerActions__2 = m_PlayerActions.FindAction("2", throwIfNotFound: true);
+        m_PlayerActions__3 = m_PlayerActions.FindAction("3", throwIfNotFound: true);
+        m_PlayerActions_LeftClick = m_PlayerActions.FindAction("LeftClick", throwIfNotFound: true);
+        m_PlayerActions_RightClick = m_PlayerActions.FindAction("RightClick", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Esc = m_UI.FindAction("Esc", throwIfNotFound: true);
@@ -323,6 +480,100 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     }
     public PlayerMovementActions @PlayerMovement => new PlayerMovementActions(this);
 
+    // PlayerActions
+    private readonly InputActionMap m_PlayerActions;
+    private List<IPlayerActionsActions> m_PlayerActionsActionsCallbackInterfaces = new List<IPlayerActionsActions>();
+    private readonly InputAction m_PlayerActions_E;
+    private readonly InputAction m_PlayerActions_R;
+    private readonly InputAction m_PlayerActions__1;
+    private readonly InputAction m_PlayerActions__2;
+    private readonly InputAction m_PlayerActions__3;
+    private readonly InputAction m_PlayerActions_LeftClick;
+    private readonly InputAction m_PlayerActions_RightClick;
+    public struct PlayerActionsActions
+    {
+        private @PlayerInput m_Wrapper;
+        public PlayerActionsActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @E => m_Wrapper.m_PlayerActions_E;
+        public InputAction @R => m_Wrapper.m_PlayerActions_R;
+        public InputAction @_1 => m_Wrapper.m_PlayerActions__1;
+        public InputAction @_2 => m_Wrapper.m_PlayerActions__2;
+        public InputAction @_3 => m_Wrapper.m_PlayerActions__3;
+        public InputAction @LeftClick => m_Wrapper.m_PlayerActions_LeftClick;
+        public InputAction @RightClick => m_Wrapper.m_PlayerActions_RightClick;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerActions; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PlayerActionsActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerActionsActions instance)
+        {
+            if (instance == null || m_Wrapper.m_PlayerActionsActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerActionsActionsCallbackInterfaces.Add(instance);
+            @E.started += instance.OnE;
+            @E.performed += instance.OnE;
+            @E.canceled += instance.OnE;
+            @R.started += instance.OnR;
+            @R.performed += instance.OnR;
+            @R.canceled += instance.OnR;
+            @_1.started += instance.On_1;
+            @_1.performed += instance.On_1;
+            @_1.canceled += instance.On_1;
+            @_2.started += instance.On_2;
+            @_2.performed += instance.On_2;
+            @_2.canceled += instance.On_2;
+            @_3.started += instance.On_3;
+            @_3.performed += instance.On_3;
+            @_3.canceled += instance.On_3;
+            @LeftClick.started += instance.OnLeftClick;
+            @LeftClick.performed += instance.OnLeftClick;
+            @LeftClick.canceled += instance.OnLeftClick;
+            @RightClick.started += instance.OnRightClick;
+            @RightClick.performed += instance.OnRightClick;
+            @RightClick.canceled += instance.OnRightClick;
+        }
+
+        private void UnregisterCallbacks(IPlayerActionsActions instance)
+        {
+            @E.started -= instance.OnE;
+            @E.performed -= instance.OnE;
+            @E.canceled -= instance.OnE;
+            @R.started -= instance.OnR;
+            @R.performed -= instance.OnR;
+            @R.canceled -= instance.OnR;
+            @_1.started -= instance.On_1;
+            @_1.performed -= instance.On_1;
+            @_1.canceled -= instance.On_1;
+            @_2.started -= instance.On_2;
+            @_2.performed -= instance.On_2;
+            @_2.canceled -= instance.On_2;
+            @_3.started -= instance.On_3;
+            @_3.performed -= instance.On_3;
+            @_3.canceled -= instance.On_3;
+            @LeftClick.started -= instance.OnLeftClick;
+            @LeftClick.performed -= instance.OnLeftClick;
+            @LeftClick.canceled -= instance.OnLeftClick;
+            @RightClick.started -= instance.OnRightClick;
+            @RightClick.performed -= instance.OnRightClick;
+            @RightClick.canceled -= instance.OnRightClick;
+        }
+
+        public void RemoveCallbacks(IPlayerActionsActions instance)
+        {
+            if (m_Wrapper.m_PlayerActionsActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IPlayerActionsActions instance)
+        {
+            foreach (var item in m_Wrapper.m_PlayerActionsActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_PlayerActionsActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public PlayerActionsActions @PlayerActions => new PlayerActionsActions(this);
+
     // UI
     private readonly InputActionMap m_UI;
     private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
@@ -374,6 +625,16 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnShift(InputAction.CallbackContext context);
         void OnWASD(InputAction.CallbackContext context);
+    }
+    public interface IPlayerActionsActions
+    {
+        void OnE(InputAction.CallbackContext context);
+        void OnR(InputAction.CallbackContext context);
+        void On_1(InputAction.CallbackContext context);
+        void On_2(InputAction.CallbackContext context);
+        void On_3(InputAction.CallbackContext context);
+        void OnLeftClick(InputAction.CallbackContext context);
+        void OnRightClick(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

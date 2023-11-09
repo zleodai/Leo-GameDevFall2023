@@ -7,6 +7,8 @@ TagManager:
   - EscMenu
   - OptionsMenu
   - BasicPest
+  - PlayerItem
+  - GameplayGUI
   layers:
   - Default
   - TransparentFX

@@ -13,6 +13,7 @@ public class PlayerCameraScript : MonoBehaviour
 
     public float xRotation;
     public float yRotation;
+    public float cameraHeightOffset;
 
     private PlayerInput inputActions;
 
@@ -28,6 +29,8 @@ public class PlayerCameraScript : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        cameraHeightOffset = 0.42f;
     }
 
     private void Look(InputAction.CallbackContext context)
@@ -47,6 +50,6 @@ public class PlayerCameraScript : MonoBehaviour
 
     private void Update()
     {
-        transform.position = playerPosition.position;
+        transform.position = new Vector3(playerPosition.position.x, playerPosition.position.y + cameraHeightOffset, playerPosition.position.z);
     }
 }

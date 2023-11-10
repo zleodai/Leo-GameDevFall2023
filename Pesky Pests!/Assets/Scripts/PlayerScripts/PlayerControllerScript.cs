@@ -378,7 +378,11 @@ public class PlayerControllerScript : MonoBehaviour
 
     public int getHeldItemSlot()
     {
-        if (heldItem == inventoryItem1)
+        if (heldItem == null)
+        {
+            return 404;
+        }
+        else if (heldItem == inventoryItem1)
         {
             return 0;
         }
@@ -524,10 +528,6 @@ public class PlayerControllerScript : MonoBehaviour
         int slot = getHeldItemSlot();
         if (slot != 404)
         {
-            if (slot != itemsInInventory() -1)
-            {
-
-            }
             int removedId = inventoryManager.removeItem(slot);
             itemManager.getItem(removedId).GetComponent<ItemInterface>().drop();
             heldItem = null;

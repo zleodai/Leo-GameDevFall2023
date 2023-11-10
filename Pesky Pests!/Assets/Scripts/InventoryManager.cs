@@ -9,7 +9,7 @@ public class InventoryManager : MonoBehaviour
 
     private void Start()
     {
-        playerControllerScript = gameObject.GetComponent<PlayerControllerScript>();
+        playerControllerScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControllerScript>();
     }
 
     public int addItem(int slot, int item)

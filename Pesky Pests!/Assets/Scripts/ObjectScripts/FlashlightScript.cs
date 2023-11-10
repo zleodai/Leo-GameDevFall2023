@@ -23,9 +23,16 @@ public class FlashlightScript : MonoBehaviour, ItemInterface
         flashlightCollider = GetComponent<BoxCollider>();
         flashlightRigidBody = GetComponent<Rigidbody>();
         flashlightMeshRenderer = GetComponent<MeshRenderer>();
-        state = false;
-        lightMeshRenderer.material = unlitLight;
-        lightRenderer.enabled = false;
+        if (state)
+        {
+            lightMeshRenderer.material = litLight;
+            lightRenderer.enabled = true;
+        }
+        else
+        {
+            lightMeshRenderer.material = unlitLight;
+            lightRenderer.enabled = false;
+        }
 
         playerCamera = GameObject.FindGameObjectWithTag("MainCamera");
     }

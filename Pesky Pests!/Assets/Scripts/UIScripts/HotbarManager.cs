@@ -7,6 +7,7 @@ using TMPro;
 public class HotbarManager : MonoBehaviour
 {
     [Header("Refrences")]
+    public PlayerControllerScript playerControllerScript;
     private InventoryManager inventoryManager;
     private ItemManager itemManager;
     private GameObject gameplayGUI;
@@ -31,16 +32,19 @@ public class HotbarManager : MonoBehaviour
     public Sprite slot3Unequiped;
     public Sprite slot3Equiped;
 
-    private Image[] slotImageArray;
     private RectTransform[] slotTransformArray;
     private Sprite[] slotEquipedArray;
     private Sprite[] slotUnequipedArray;
+
+
+    public int equippedSlot;
 
     private void Start()
     {
         gameplayGUI = GameObject.FindGameObjectWithTag("GameplayGUI");
         inventoryManager = GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryManager>();
         itemManager = ItemManager.instance;
+        playerControllerScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControllerScript>();
 
         slot1 = gameplayGUI.transform.Find("Slot1").gameObject;
         slot1Image = slot1.GetComponent<Image>();
@@ -53,11 +57,6 @@ public class HotbarManager : MonoBehaviour
         slot3 = gameplayGUI.transform.Find("Slot3").gameObject;
         slot3Image = slot3.GetComponent<Image>();
         slot3Transform = slot3.GetComponent<RectTransform>();
-
-        slotImageArray = new Image[3];
-        slotImageArray[0] = slot1Image;
-        slotImageArray[1] = slot2Image;
-        slotImageArray[2] = slot3Image;
 
         slotTransformArray = new RectTransform[3];
         slotTransformArray[0] = slot1Transform;
@@ -80,7 +79,11 @@ public class HotbarManager : MonoBehaviour
         Dictionary<int, int> heldItems = new Dictionary<int, int>();
         int heldItemCount = -1;
         int counter = 0;
-        int[] slotOrder = { -1, -1, -1 };
+        int[] slotOrder = new int[inventoryManager.inventory.Length];
+        for (int i = 0; i < inventoryManager.inventory.Length; i++)
+        {
+            slotOrder[i] = -1;
+        }
         int slotOrderCounter = 0;
         for (int i = 0; i < inventoryManager.inventory.Length; i++)
         {
@@ -97,130 +100,53 @@ public class HotbarManager : MonoBehaviour
             counter++;
         }
 
-        //Debug.Log("Buttons: " + (heldItemCount + 1).ToString() + "\n");
-
-        for (int i = 0; i < heldItemCount + 1; i++)
+        int hotbarOrderIndex = 0;
+        foreach (int slot in slotOrder)
         {
-            //Debug.Log("Button " + (i + 1).ToString());
-            switch (heldItemCount)
+            if (slot != -1)
             {
-                case 0:
-                    slotTransformArray[i].localPosition = new Vector3(0, -400, 0);
-                    Sprite sprite = itemManager.getSprite(inventoryManager.getSlotItem(i));
-                    if (sprite != null)
-                    {
-                        slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = sprite;
-                    }
-                    else
-                    {
-                        slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = UIMask;
-                    }
-                    //Debug.Log("First button " + inventoryManager.getSlotItem(i).ToString());
-                    //Debug.Log("Position: " + slotTransformArray[i].position.ToString());
-                    break;
-                case 1:
-                    switch (i)
-                    {
-                        case 0:
-                            slotTransformArray[i].localPosition = new Vector3(-75, -400, 0);
-                            Sprite sprite1 = itemManager.getSprite(inventoryManager.getSlotItem(i));
-                            if (sprite1 != null)
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = sprite1;
-                            }
-                            else
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = UIMask;
-                            }
-                            //Debug.Log("First button: " + inventoryManager.getSlotItem(i).ToString());
-                            //Debug.Log("Position: " + slotTransformArray[i].position.ToString());
-                            break;
-                        case 1:
-                            slotTransformArray[i].localPosition = new Vector3(75, -400, 0);
-                            Sprite sprite2 = itemManager.getSprite(inventoryManager.getSlotItem(i));
-                            if (sprite2 != null)
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = sprite2;
-                            } else
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = UIMask;
-                            }
-                            //Debug.Log("Second button: " + inventoryManager.getSlotItem(i).ToString());
-                            //Debug.Log("Position: " + slotTransformArray[i].position.ToString());
-                            break;
-                    }
-                    break;
-                case 2:
-                    switch (i)
-                    {
-                        case 0:
-                            slotTransformArray[i].localPosition = new Vector3(-150, -400, 0);
-                            Sprite sprite3 = itemManager.getSprite(inventoryManager.getSlotItem(i));
-                            if (sprite3 != null)
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = sprite3;
-                            }
-                            else
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = UIMask;
-                            }
-                            //Debug.Log("First button: " + inventoryManager.getSlotItem(i).ToString());
-                            //Debug.Log("Position: " + slotTransformArray[i].position.ToString());
-                            break;
-                        case 1:
-                            slotTransformArray[i].localPosition = new Vector3(0, -400, 0);
-                            Sprite sprite4 = itemManager.getSprite(inventoryManager.getSlotItem(i));
-                            if (sprite4 != null)
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = sprite4;
-                            }
-                            else
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = UIMask;
-                            }
-                            //Debug.Log("Second button: " + inventoryManager.getSlotItem(i).ToString());
-                            //Debug.Log("Position: " + slotTransformArray[i].position.ToString());
-                            break;
-                        case 2:
-                            slotTransformArray[i].localPosition = new Vector3(150, -400, 0);
-                            Sprite sprite5 = itemManager.getSprite(inventoryManager.getSlotItem(i));
-                            if (sprite5 != null)
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = sprite5;
-                            }
-                            else
-                            {
-                                slotTransformArray[i].gameObject.transform.Find("Image").gameObject.GetComponent<Image>().sprite = UIMask;
-                            }
-                            //Debug.Log("Third button: " + inventoryManager.getSlotItem(i).ToString());
-                            //Debug.Log("Position: " + slotTransformArray[i].position.ToString());
-                            break;
-                    }
-                    break;
+                int xValue = (150 * hotbarOrderIndex) - (slotOrderCounter * 150 / 2);
+                slotTransformArray[slot].localPosition = new Vector3(xValue, -400, 0);
+                Sprite sprite = itemManager.getSprite(inventoryManager.getSlotItem(slot));
+                if (sprite != null)
+                {
+                    slotTransformArray[slot].Find("Image").gameObject.GetComponent<Image>().sprite = sprite;
+                }
+                else
+                {
+                    slotTransformArray[slot].Find("Image").gameObject.GetComponent<Image>().sprite = UIMask;
+                }
+                hotbarOrderIndex++;
             }
         }
-        switch (heldItemCount)
+
+        int heldItemSlot = playerControllerScript.getHeldItemSlot();
+        if (heldItemSlot != 404)
         {
-            case -1:
-                slot1.SetActive(false);
-                slot2.SetActive(false);
-                slot3.SetActive(false);
-                break;
-            case 0:
-                slot1.SetActive(true);
-                slot2.SetActive(false); 
-                slot3.SetActive(false);
-                break;
-            case 1:
-                slot1.SetActive(true);
-                slot2.SetActive(true);
-                slot3.SetActive(false);
-                break;
-            case 2:
-                slot1.SetActive(true);
-                slot2.SetActive(true);
-                slot3.SetActive(true);
-                break;
+            slotTransformArray[heldItemSlot].gameObject.GetComponent<Image>().sprite = slotEquipedArray[heldItemSlot];
+        }
+
+        for (int i = 0; i < inventoryManager.inventory.Length; i++)
+        {
+            bool slotFound = false;
+            foreach (int slot in slotOrder)
+            {
+                if (slot == i)
+                {
+                    slotFound = true;
+                }
+            }
+            if (slotFound)
+            {
+                slotTransformArray[i].gameObject.SetActive(true);
+                if (heldItemSlot != i)
+                {
+                    slotTransformArray[i].gameObject.GetComponent<Image>().sprite = slotUnequipedArray[i];
+                }
+            } else
+            {
+                slotTransformArray[i].gameObject.SetActive(false);
+            }
         }
     }
 }

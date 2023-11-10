@@ -79,6 +79,9 @@ public class HotbarManager : MonoBehaviour
     {
         Dictionary<int, int> heldItems = new Dictionary<int, int>();
         int heldItemCount = -1;
+        int counter = 0;
+        int[] slotOrder = { -1, -1, -1 };
+        int slotOrderCounter = 0;
         for (int i = 0; i < inventoryManager.inventory.Length; i++)
         {
             if (inventoryManager.getSlotItem(i) != 0)
@@ -87,15 +90,18 @@ public class HotbarManager : MonoBehaviour
                 {
                     heldItemCount += 1;
                     heldItems[heldItemCount] = inventoryManager.getSlotItem(i);
+                    slotOrder[slotOrderCounter] = counter;
+                    slotOrderCounter++;
                 }
             }
+            counter++;
         }
 
-        Debug.Log("Buttons: " + (heldItemCount + 1).ToString() + "\n");
+        //Debug.Log("Buttons: " + (heldItemCount + 1).ToString() + "\n");
 
         for (int i = 0; i < heldItemCount + 1; i++)
         {
-            Debug.Log("Button " + (i + 1).ToString());
+            //Debug.Log("Button " + (i + 1).ToString());
             switch (heldItemCount)
             {
                 case 0:
@@ -193,7 +199,6 @@ public class HotbarManager : MonoBehaviour
                     break;
             }
         }
-
         switch (heldItemCount)
         {
             case -1:

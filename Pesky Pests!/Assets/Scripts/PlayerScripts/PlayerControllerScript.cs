@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class PlayerControllerScript : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class PlayerControllerScript : MonoBehaviour
     private Rigidbody playerRigidbody;
     private GameManager gameManager;
     private InventoryManager inventoryManager;
+    private Transform playerCameraTransform;
+    private ItemManager itemManager;
     
     [Header("Movement")]
     public Vector2 wasdVector;
@@ -38,7 +41,16 @@ public class PlayerControllerScript : MonoBehaviour
     private GameObject inventoryItem2 = null;
     private GameObject inventoryItem3 = null;
 
-    
+    [Header("Actions")]
+    public float hoverOverItemLength;
+    private LayerMask itemLayer;
+    private GameObject hoverItem;
+
+    [Header("GUI")]
+    public TextMeshProUGUI interactText;
+    public TextMeshProUGUI replaceText;
+
+
     private enum MovementState
     {
         Running,
@@ -57,8 +69,10 @@ public class PlayerControllerScript : MonoBehaviour
         orientation = gameObject.transform.Find("Orientation");
         gameManager = GameObject.FindFirstObjectByType<GameManager>();
         inventoryManager = gameObject.GetComponent<InventoryManager>();
+        playerCameraTransform = GameObject.FindGameObjectWithTag("MainCamera").transform;
 
         groundLayer = LayerMask.GetMask("GroundLayer");
+        itemLayer = LayerMask.GetMask("Item");
 
         //Initalize values
         playerHeight = 2f;
@@ -68,6 +82,7 @@ public class PlayerControllerScript : MonoBehaviour
         airMultiplier = 1f;
         groundDrag = 0.25f;
         runMult = 2.5f;
+        hoverOverItemLength = 5f;
 
         //Player Movement Input
         playerInput = new PlayerInput();
@@ -85,26 +100,33 @@ public class PlayerControllerScript : MonoBehaviour
         playerInput.PlayerActions._2.performed += TWOperformed;
         playerInput.PlayerActions._3.performed += THREEperformed;
         playerInput.PlayerActions.E.performed += EPerformed;
+        playerInput.PlayerActions.R.performed += RPerformed;
+        playerInput.PlayerActions.G.performed += GPerformed;
 
         //Player UI Input
         playerInput.UI.Esc.performed += ESCPressed;
+
+        //Debug for if public variables not assigned
+        if (interactText == null || replaceText == null)
+        {
+            Debug.Log("Please assign interactText and replaceText in public variables for playerControllerScript object");
+        }
 
         //For Debug delete later
         if (heldItem != null)
         {
             heldItemScript = heldItem.GetComponent<ItemInterface>();
         }
-    }   
+    }
+
+    private void Start()
+    {
+        itemManager = ItemManager.instance;
+    }
 
     private void Update()
     {
-        grounded = Physics.Raycast(playerTransform.position + new Vector3(0f, playerHeight * 0.5f, 0f), Vector3.down, playerHeight + playerJumpOffset, groundLayer);
-
-        MovePlayer();
-        SpeedControl();
-
-        playerTransform.rotation = orientation.rotation;
-
+        //States
         if (gameManager.gameState == GameManager.GameState.GAMEPLAY)
         {
             if (shiftPressed) movementState = MovementState.Running;
@@ -114,6 +136,19 @@ public class PlayerControllerScript : MonoBehaviour
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            playerTransform.rotation = orientation.rotation;
+
+            //Movement
+            MovePlayer();
+            SpeedControl();
+
+            //Actions
+            hoverItem = ItemHoverOver();
+
+            //UI
+            UpdateInventoryItems();
+            
         } else if (gameManager.gameState == GameManager.GameState.MENU)
         {
             movementState = MovementState.Paused;
@@ -165,12 +200,14 @@ public class PlayerControllerScript : MonoBehaviour
             playerRigidbody.velocity = new Vector3(velocity.x * groundDrag, playerRigidbody.velocity.y, velocity.z * groundDrag);
             //Add Script to bind player to ground
         }
-
         rigidBodyVelocity = playerRigidbody.velocity;
     }
 
     private void MovePlayer()
     {
+        grounded = Physics.Raycast(playerTransform.position + new Vector3(0f, playerHeight * 0.5f, 0f), Vector3.down, playerHeight + playerJumpOffset, groundLayer);
+
+
         if (movementState == MovementState.Walking)
         {
             moveDirection = orientation.forward * wasdVector.y + orientation.right * wasdVector.x;
@@ -196,6 +233,7 @@ public class PlayerControllerScript : MonoBehaviour
     {
         if (heldItem != null)
         {
+            heldItemScript = heldItem.GetComponent<ItemInterface>();
             if (heldItemScript != null)
             {
                 heldItemScript.interact();
@@ -207,7 +245,7 @@ public class PlayerControllerScript : MonoBehaviour
         }
         else
         {
-            Debug.Log("Not holding any item");
+            //Debug.Log("Not holding any item");
         }
     }
 
@@ -357,9 +395,148 @@ public class PlayerControllerScript : MonoBehaviour
         }
     }
 
+    private bool inventoryFull()
+    {
+        foreach (int id in inventoryManager.inventory)
+        {
+            if (id == 0)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int getNextInventorySlot()
+    {
+        int count = 0;
+        foreach(int id in inventoryManager.inventory)
+        {
+            if (id == 0)
+            {
+                return count;
+            }
+            count++;
+        }
+        return 404;
+    }
+
+    private int itemsInInventory()
+    {
+        int counter = 0;
+        foreach (int id in inventoryManager.inventory)
+        {
+            if (id != 0)
+            {
+                counter++;
+            }
+        }
+        return counter;
+    }
+
+    private GameObject ItemHoverOver()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out hit, hoverOverItemLength, itemLayer))
+        {
+            if (inventoryFull())
+            {
+                replaceText.enabled = true;
+                interactText.enabled = false;
+                return hit.collider.gameObject;
+            } else
+            {
+                interactText.enabled = true;
+                replaceText.enabled = false;
+                return hit.collider.gameObject;
+            }
+        } else
+        {
+            interactText.enabled = false;
+            replaceText.enabled = false;
+            return null;
+        }
+    }
+
+    private void UpdateInventoryItems()
+    {
+        inventoryItem1 = itemManager.getItem(inventoryManager.getSlotItem(0));
+        inventoryItem2 = itemManager.getItem(inventoryManager.getSlotItem(1));
+        inventoryItem3 = itemManager.getItem(inventoryManager.getSlotItem(2));
+    }
+
     private void EPerformed(InputAction.CallbackContext context)
     {
+        if (hoverItem != null)
+        {
+            int nextSlot = getNextInventorySlot();
+            if (nextSlot != 404)
+            {
+                int itemId = itemManager.getId(hoverItem);
+                if (itemId != 404)
+                {
+                    inventoryManager.addItem(nextSlot, itemId);
+                    hoverItem.GetComponent<ItemInterface>().pickup();
+                }
+                else
+                {
+                    Debug.Log("Error, Item Not Found in itemDictionary");
+                }
+            }
+            else
+            {
+                Debug.Log("Next slot could not be found");
+            }
+        }
+    }
 
+    private void RPerformed(InputAction.CallbackContext context)
+    {
+        if (hoverItem != null)
+        {
+            int slot = getHeldItemSlot();
+            if (slot != 404)
+            {
+                int itemId = itemManager.getId(hoverItem);
+                if (itemId != 404)
+                {
+                    int removedId = inventoryManager.removeItem(slot);
+                    itemManager.getItem(removedId).GetComponent<ItemInterface>().drop();
+                    inventoryManager.addItem(slot, itemId);
+                    hoverItem.GetComponent<ItemInterface>().pickup();
+                    heldItem = null;
+                    heldItemScript = null;
+                }
+                else
+                {
+                    Debug.Log("Error, Item Not Found in itemDictionary");
+                }
+            }
+            else
+            {
+                Debug.Log("Helditem slot could not be found");
+            }
+        }
+    }
+
+    private void GPerformed(InputAction.CallbackContext context)
+    {
+        int slot = getHeldItemSlot();
+        if (slot != 404)
+        {
+            if (slot != itemsInInventory() -1)
+            {
+
+            }
+            int removedId = inventoryManager.removeItem(slot);
+            itemManager.getItem(removedId).GetComponent<ItemInterface>().drop();
+            heldItem = null;
+            heldItemScript = null;
+        }
+        else
+        {
+            Debug.Log("Helditem slot could not be found");
+        }
     }
 
     //UI Interactions

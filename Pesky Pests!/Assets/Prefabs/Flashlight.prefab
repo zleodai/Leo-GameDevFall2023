@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5496970008871462097}
   - component: {fileID: 5961933456523440236}
   - component: {fileID: 3358340891769175007}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Flashlight
   m_TagString: PlayerItem
   m_Icon: {fileID: 0}
@@ -194,7 +194,7 @@ GameObject:
   - component: {fileID: 5355745168175522855}
   - component: {fileID: 5355745168175522874}
   - component: {fileID: 5355745168175522853}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -278,7 +278,7 @@ GameObject:
   - component: {fileID: 1458356874089535597}
   - component: {fileID: 9020040520080726915}
   - component: {fileID: 8049495954230798343}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}

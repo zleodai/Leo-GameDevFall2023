@@ -26,7 +26,7 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    public int dropItem(int slot)
+    public int removeItem(int slot)
     {
         int oldItem = inventory[slot];
         inventory[slot] = 0;

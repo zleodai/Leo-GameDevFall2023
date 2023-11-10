@@ -156,6 +156,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "G",
+                    "type": "Button",
+                    "id": "5148f62d-be33-4d0e-84ea-a66f5069c613",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "1",
                     "type": "Button",
                     "id": "2635ac7e-6885-4241-b090-71a656f58dba",
@@ -276,6 +285,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "R",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ef89212c-0efa-48ed-838f-903f08c90ccc",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "G",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

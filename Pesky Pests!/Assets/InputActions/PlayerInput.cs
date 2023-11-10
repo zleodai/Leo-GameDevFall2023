@@ -178,6 +178,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""G"",
+                    ""type"": ""Button"",
+                    ""id"": ""5148f62d-be33-4d0e-84ea-a66f5069c613"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""1"",
                     ""type"": ""Button"",
                     ""id"": ""2635ac7e-6885-4241-b090-71a656f58dba"",
@@ -300,6 +309,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""R"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ef89212c-0efa-48ed-838f-903f08c90ccc"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""G"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -344,6 +364,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_PlayerActions = asset.FindActionMap("PlayerActions", throwIfNotFound: true);
         m_PlayerActions_E = m_PlayerActions.FindAction("E", throwIfNotFound: true);
         m_PlayerActions_R = m_PlayerActions.FindAction("R", throwIfNotFound: true);
+        m_PlayerActions_G = m_PlayerActions.FindAction("G", throwIfNotFound: true);
         m_PlayerActions__1 = m_PlayerActions.FindAction("1", throwIfNotFound: true);
         m_PlayerActions__2 = m_PlayerActions.FindAction("2", throwIfNotFound: true);
         m_PlayerActions__3 = m_PlayerActions.FindAction("3", throwIfNotFound: true);
@@ -485,6 +506,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private List<IPlayerActionsActions> m_PlayerActionsActionsCallbackInterfaces = new List<IPlayerActionsActions>();
     private readonly InputAction m_PlayerActions_E;
     private readonly InputAction m_PlayerActions_R;
+    private readonly InputAction m_PlayerActions_G;
     private readonly InputAction m_PlayerActions__1;
     private readonly InputAction m_PlayerActions__2;
     private readonly InputAction m_PlayerActions__3;
@@ -496,6 +518,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public PlayerActionsActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @E => m_Wrapper.m_PlayerActions_E;
         public InputAction @R => m_Wrapper.m_PlayerActions_R;
+        public InputAction @G => m_Wrapper.m_PlayerActions_G;
         public InputAction @_1 => m_Wrapper.m_PlayerActions__1;
         public InputAction @_2 => m_Wrapper.m_PlayerActions__2;
         public InputAction @_3 => m_Wrapper.m_PlayerActions__3;
@@ -516,6 +539,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @R.started += instance.OnR;
             @R.performed += instance.OnR;
             @R.canceled += instance.OnR;
+            @G.started += instance.OnG;
+            @G.performed += instance.OnG;
+            @G.canceled += instance.OnG;
             @_1.started += instance.On_1;
             @_1.performed += instance.On_1;
             @_1.canceled += instance.On_1;
@@ -541,6 +567,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @R.started -= instance.OnR;
             @R.performed -= instance.OnR;
             @R.canceled -= instance.OnR;
+            @G.started -= instance.OnG;
+            @G.performed -= instance.OnG;
+            @G.canceled -= instance.OnG;
             @_1.started -= instance.On_1;
             @_1.performed -= instance.On_1;
             @_1.canceled -= instance.On_1;
@@ -630,6 +659,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     {
         void OnE(InputAction.CallbackContext context);
         void OnR(InputAction.CallbackContext context);
+        void OnG(InputAction.CallbackContext context);
         void On_1(InputAction.CallbackContext context);
         void On_2(InputAction.CallbackContext context);
         void On_3(InputAction.CallbackContext context);

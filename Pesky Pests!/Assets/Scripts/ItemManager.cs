@@ -31,7 +31,6 @@ public class ItemManager : MonoBehaviour
 
         foreach (GameObject item in playerItems)
         {
-            Debug.Log(item.name);
             if(item.GetComponents<FlashlightScript>() != null)
             {
                 itemDictionary.Add(dictionaryIndex, item);
@@ -53,7 +52,23 @@ public class ItemManager : MonoBehaviour
 
     public GameObject getItem(int id)
     {
+        if (id == 0)
+        {
+            return null;
+        }
         return itemDictionary[id];
+    }
+
+    public int getId(GameObject item)
+    {
+        foreach(int id in itemDictionary.Keys)
+        {
+            if (itemDictionary[id] == item)
+            {
+                return id;
+            }
+        }
+        return 404;
     }
 
     public Sprite getSprite(int id)

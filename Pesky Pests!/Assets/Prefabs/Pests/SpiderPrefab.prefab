@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7530376764123576407}
   - component: {fileID: 5721175220713163933}
   - component: {fileID: 7530376764123576404}
-  - component: {fileID: 7530376764123576405}
   m_Layer: 0
   m_Name: SpiderPrefab
   m_TagString: Untagged
@@ -105,23 +104,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -5495902117074765545, guid: edff67b6a7da7464ba6fe99d62160142, type: 3}
---- !u!114 &7530376764123576405
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6081353721152777544}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9c80fbd305255d4bafeab941da96752, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  orientation: {x: 0, y: 0, z: 0}
-  playerPosition: {x: 0, y: 0, z: 0}
-  position: {x: 0, y: 0, z: 0}
-  distanceFromPlayer: 0
-  state: 0
 --- !u!1001 &3334716194090328426
 PrefabInstance:
   m_ObjectHideFlags: 0

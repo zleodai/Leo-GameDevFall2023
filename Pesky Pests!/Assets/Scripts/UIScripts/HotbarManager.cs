@@ -10,6 +10,7 @@ public class HotbarManager : MonoBehaviour
     public PlayerControllerScript playerControllerScript;
     private InventoryManager inventoryManager;
     private ItemManager itemManager;
+    private GameManager gameManager;
     private GameObject gameplayGUI;
     public Sprite UIMask;
 
@@ -41,7 +42,8 @@ public class HotbarManager : MonoBehaviour
 
     private void Start()
     {
-        gameplayGUI = GameObject.FindGameObjectWithTag("GameplayGUI");
+        gameManager = GameManager.instance;
+        gameplayGUI = gameManager.GameplayGUI;
         inventoryManager = GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryManager>();
         itemManager = ItemManager.instance;
         playerControllerScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControllerScript>();

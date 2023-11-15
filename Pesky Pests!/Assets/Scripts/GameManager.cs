@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public float EscMenuButtonDefaultSize;
     public float EscMenuButtonPopSize;
     public GameObject ControlsMenu;
+    public GameObject GameplayGUI;
 
     public enum GameState 
     {
@@ -47,6 +48,10 @@ public class GameManager : MonoBehaviour
         {
             ControlsMenu = GameObject.FindGameObjectWithTag("OptionsMenu");
         }
+        if (GameplayGUI == null)
+        {
+            GameplayGUI = GameObject.FindGameObjectWithTag("GameplayGUI");
+        }
     }
 
     private void Start()
@@ -56,14 +61,17 @@ public class GameManager : MonoBehaviour
 
     public void setGameState(GameState state)
     {
+        //Replace with swith case later
         gameState = state;
         if (gameState == GameState.GAMEPLAY)
         {
+            GameplayGUI.SetActive(true);
             EscMenu.SetActive(false);
             ControlsMenu.SetActive(false);
         }
         else if (gameState == GameState.MENU)
         {
+            GameplayGUI.SetActive(false);
             EscMenu.SetActive(true);
             ControlsMenu.SetActive(false);
         }

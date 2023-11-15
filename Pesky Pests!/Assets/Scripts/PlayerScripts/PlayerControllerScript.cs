@@ -129,6 +129,7 @@ public class PlayerControllerScript : MonoBehaviour
         //States
         if (gameManager.gameState == GameManager.GameState.GAMEPLAY)
         {
+            playerInput.Enable();
             if (shiftPressed) movementState = MovementState.Running;
             else movementState = MovementState.Walking;
 
@@ -151,6 +152,7 @@ public class PlayerControllerScript : MonoBehaviour
             
         } else if (gameManager.gameState == GameManager.GameState.MENU)
         {
+            playerInput.Disable();
             movementState = MovementState.Paused;
             Time.timeScale = 0;
             Cursor.lockState = CursorLockMode.Confined;

@@ -483,6 +483,8 @@ public class SpiderScript : MonoBehaviour, PestInterface
 
     private void deathEvent()
     {
+        makeEyesBright(false);
+        stopMoving();
         Destroy(this);
     }
 }

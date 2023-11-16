@@ -15807,6 +15807,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -76.151
       objectReference: {fileID: 0}
+    - target: {fileID: 5371559209191945318, guid: 92a70fc7bdbe8564c94dfd76e0d27e7b,
+        type: 3}
+      propertyPath: NoiseModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 92a70fc7bdbe8564c94dfd76e0d27e7b, type: 3}
 --- !u!4 &5276409997617662781

@@ -73,9 +73,15 @@ public class ItemManager : MonoBehaviour
             {
                 return id;
             }
-            else if (itemDictionary[id] == item.transform.parent.gameObject)
+            else
             {
-                return id;
+                if (item.transform.parent != null)
+                {
+                    if (itemDictionary[id] == item.transform.parent.gameObject)
+                    {
+                        return id;
+                    }
+                }
             }
         }
         return 404;

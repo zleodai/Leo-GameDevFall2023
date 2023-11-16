@@ -251,6 +251,9 @@ public class SpiderScript : MonoBehaviour, PestInterface
     public void TakeDamage(float damage)
     {
         health -= damage;
+        seenPlayer = true;
+        lastSeenPlayerLocation = playerMesh.position;
+        TransitionState(PestInterface.State.Chasing);
     }
 
     public void AddDebuff(PestInterface.Debuff debuff)

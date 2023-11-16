@@ -6,6 +6,7 @@ public interface PestInterface
 {
     public enum State
     {
+        Paused,
         Idle,
         Patroling,
         Stalking,

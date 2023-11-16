@@ -9,11 +9,13 @@ TagManager:
   - BasicPest
   - PlayerItem
   - GameplayGUI
+  - LightObject
+  - SpiderPatrolPoint
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - PlayerLayer
   - Water
   - UI
   - Item

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5046371646715421690}
   - component: {fileID: 5046371646715421685}
   - component: {fileID: 5046371646715421684}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 5046371647332999295}
   - component: {fileID: 5046371647332999294}
   - component: {fileID: 5046371647332999289}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Connector (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -207,7 +207,7 @@ GameObject:
   - component: {fileID: 5046371647504693396}
   - component: {fileID: 5046371647504693399}
   - component: {fileID: 5046371647504693398}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Lamp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -306,7 +306,7 @@ GameObject:
   - component: {fileID: 5046371647728677241}
   - component: {fileID: 5046371647728677247}
   - component: {fileID: 5046371647728677246}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -422,7 +422,7 @@ GameObject:
   - component: {fileID: 5046371647893112239}
   - component: {fileID: 5046371647893112238}
   - component: {fileID: 5046371647893112233}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Connector
   m_TagString: Untagged
   m_Icon: {fileID: 0}

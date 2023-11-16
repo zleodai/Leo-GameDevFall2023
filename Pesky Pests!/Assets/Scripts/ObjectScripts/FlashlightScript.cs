@@ -59,6 +59,7 @@ public class FlashlightScript : MonoBehaviour, ItemInterface
         lightMeshRenderer.enabled = true;
         gameObject.transform.parent = playerCamera.transform;
         gameObject.transform.localPosition = new Vector3(0.448f, -0.503f, 0.665f);
+        lightRenderer.gameObject.transform.localPosition = new Vector3(1.63f, -27.5f, -2.03f);
         Quaternion rotation = new Quaternion();
         rotation.eulerAngles = new Vector3(0, 90, 90);
         gameObject.transform.localRotation = rotation;
@@ -89,6 +90,7 @@ public class FlashlightScript : MonoBehaviour, ItemInterface
 
     public void drop()
     {
+        lightRenderer.gameObject.transform.localPosition = new Vector3(0f, 0f, 0f);
         flashlightCollider.enabled = true;
         flashlightRigidBody.isKinematic = false;
         flashlightMeshRenderer.enabled = true;

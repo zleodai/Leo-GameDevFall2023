@@ -108,6 +108,7 @@ public class HotbarManager : MonoBehaviour
             if (slot != -1)
             {
                 int xValue = (150 * hotbarOrderIndex) - (slotOrderCounter * 150 / 2);
+                xValue += 75;
                 slotTransformArray[slot].localPosition = new Vector3(xValue, -400, 0);
                 Sprite sprite = itemManager.getSprite(inventoryManager.getSlotItem(slot));
                 if (sprite != null)

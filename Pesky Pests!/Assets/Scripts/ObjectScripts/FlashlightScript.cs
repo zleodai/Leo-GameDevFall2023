@@ -53,6 +53,22 @@ public class FlashlightScript : MonoBehaviour, ItemInterface
         }
     }
 
+    public void updateState()
+    {
+        if (state)
+        {
+            lightMeshRenderer.material = litLight;
+            lightRenderer.enabled = true;
+            state = true;
+        }
+        else
+        {
+            lightMeshRenderer.material = unlitLight;
+            lightRenderer.enabled = false;
+            state = false;
+        }
+    }
+
     public void equip()
     {
         flashlightMeshRenderer.enabled = true;

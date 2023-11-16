@@ -31,7 +31,13 @@ public class ItemManager : MonoBehaviour
 
         foreach (GameObject item in playerItems)
         {
-            if(item.GetComponents<FlashlightScript>() != null)
+            if(item.GetComponent<FlashlightScript>() != null)
+            {
+                itemDictionary.Add(dictionaryIndex, item);
+                spriteDictionary.Add(dictionaryIndex, item.GetComponent<SpriteMask>().sprite);
+                dictionaryIndex++;
+            }
+            else if(item.GetComponent<FlamethrowerScript>() != null)
             {
                 itemDictionary.Add(dictionaryIndex, item);
                 spriteDictionary.Add(dictionaryIndex, item.GetComponent<SpriteMask>().sprite);
@@ -64,6 +70,10 @@ public class ItemManager : MonoBehaviour
         foreach(int id in itemDictionary.Keys)
         {
             if (itemDictionary[id] == item)
+            {
+                return id;
+            }
+            else if (itemDictionary[id] == item.transform.parent.gameObject)
             {
                 return id;
             }

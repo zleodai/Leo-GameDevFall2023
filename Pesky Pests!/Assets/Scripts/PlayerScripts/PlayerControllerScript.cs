@@ -50,6 +50,9 @@ public class PlayerControllerScript : MonoBehaviour
     public TextMeshProUGUI interactText;
     public TextMeshProUGUI replaceText;
 
+    [Header("Stats")]
+    public float health;
+
 
     private enum MovementState
     {
@@ -117,6 +120,8 @@ public class PlayerControllerScript : MonoBehaviour
         {
             heldItemScript = heldItem.GetComponent<ItemInterface>();
         }
+
+        health = 100f;
     }
 
     private void Start()
@@ -552,5 +557,11 @@ public class PlayerControllerScript : MonoBehaviour
         {
             gameManager.setGameState(GameManager.GameState.GAMEPLAY);
         }
+    }
+
+    public void takeDamage(float damage)
+    {
+        health -= damage;
+
     }
 }

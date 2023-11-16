@@ -15,6 +15,13 @@ public interface PestInterface
         Running
     }
 
+    public enum Debuff
+    {
+        OnFire
+    }
+
     void StateHandeler();
     void TransitionState(State newState);
+    void TakeDamage(float damage);
+    void AddDebuff(Debuff debuff);
 }

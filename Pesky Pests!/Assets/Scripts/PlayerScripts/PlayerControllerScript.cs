@@ -38,8 +38,15 @@ public class PlayerControllerScript : MonoBehaviour
     public float airMultiplier;
     public float groundDrag;
     public float runMult;
-
     private bool shiftPressed;
+    private enum MovementState
+    {
+        Running,
+        Walking,
+        Paused,
+        Frozen
+    }
+    private MovementState movementState;
 
     [Header("Inventory")]
     public GameObject heldItem;
@@ -57,21 +64,30 @@ public class PlayerControllerScript : MonoBehaviour
     public TextMeshProUGUI interactText;
     public TextMeshProUGUI replaceText;
     private GameObject[] bloodSplats;
+    private float maxRedColorValue = 3f;
+    private float minRedColorValue = 1f;
+    private float maxIntensity = 3f;
+    private float minIntensity = 0.5f;
 
     [Header("Stats")]
     public float health;
+    private float maxHealth;
 
-
-    private enum MovementState
+    [Header("Events")]
+    private Dictionary<int, Event> activeEvents;
+    private Dictionary<int, float> eventTimers;
+    private int eventIds = 0;
+    private List<int> inactiveEvents;
+    private enum Event
     {
-        Running,
-        Walking,
-        Paused,
-        Frozen
+        tookDamage
     }
+    private bool tookDamageEvent;
+    public float tookDamageRedColor;
+    public float tookDamageIntensity;
+    public float tookDamageEventTime;
 
-    private MovementState movementState;
-
+    //Unity Functions
     private void Awake()
     {
         playerTransform = gameObject.transform.Find("PlayerMesh").transform;
@@ -99,6 +115,41 @@ public class PlayerControllerScript : MonoBehaviour
         runMult = 2.5f;
         hoverOverItemLength = 5f;
 
+        //Debug for if public variables not assigned
+        if (interactText == null || replaceText == null)
+        {
+            Debug.Log("Please assign interactText and replaceText in public variables for playerControllerScript object");
+        }
+
+        //For Debug delete later
+        if (heldItem != null)
+        {
+            heldItemScript = heldItem.GetComponent<ItemInterface>();
+        }
+
+        if (maxHealth == 0f) maxHealth = 100f;
+        health = maxHealth;
+
+        //Events
+
+        activeEvents = new Dictionary<int, Event>();
+        eventTimers = new Dictionary<int, float>();
+        inactiveEvents = new List<int>();
+
+        if (tookDamageRedColor == 0f) tookDamageRedColor = 2.5f;
+        if (tookDamageIntensity == 0f) tookDamageIntensity = 0.5f;
+        if (tookDamageEventTime == 0f) tookDamageEventTime = 0.225f;
+    }
+    private void Start()
+    {
+        itemManager = ItemManager.instance;
+
+        bloodSplats = GameObject.FindGameObjectsWithTag("BloodSplat");
+        foreach (GameObject bloodSplat in bloodSplats)
+        {
+            bloodSplat.GetComponent<Image>().enabled = false;
+        }
+
         //Player Movement Input
         playerInput = new PlayerInput();
         playerInput.Enable();
@@ -123,68 +174,48 @@ public class PlayerControllerScript : MonoBehaviour
 
         //Player UI Input
         playerInput.UI.Esc.performed += ESCPressed;
-
-        //Debug for if public variables not assigned
-        if (interactText == null || replaceText == null)
-        {
-            Debug.Log("Please assign interactText and replaceText in public variables for playerControllerScript object");
-        }
-
-        //For Debug delete later
-        if (heldItem != null)
-        {
-            heldItemScript = heldItem.GetComponent<ItemInterface>();
-        }
-
-        health = 100f;
     }
-
-    private void Start()
-    {
-        itemManager = ItemManager.instance;
-
-        bloodSplats = GameObject.FindGameObjectsWithTag("BloodSplat");
-        foreach (GameObject bloodSplat in bloodSplats)
-        {
-            bloodSplat.GetComponent<Image>().enabled = false;
-        }
-    }
-
     private void Update()
     {
         //States
-        if (gameManager.gameState == GameManager.GameState.GAMEPLAY)
+        switch (gameManager.gameState)
         {
-            playerInput.Enable();
-            if (shiftPressed) movementState = MovementState.Running;
-            else movementState = MovementState.Walking;
+            case GameManager.GameState.GAMEPLAY:
+                playerInput.Enable();
+                if (shiftPressed) movementState = MovementState.Running;
+                else movementState = MovementState.Walking;
 
-            Time.timeScale = 1;
+                Time.timeScale = 1;
 
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
 
-            playerTransform.rotation = orientation.rotation;
+                playerTransform.rotation = orientation.rotation;
 
-            //Movement
-            MovePlayer();
-            SpeedControl();
+                //Movement
+                MovePlayer();
+                SpeedControl();
 
-            //Actions
-            hoverItem = ItemHoverOver();
+                //Actions
+                hoverItem = ItemHoverOver();
 
-            //UI
-            UpdateInventoryItems();
+                //UI
+                UpdateInventoryItems();
+                healthCheck();
 
-            healthCheck();
-            
-        } else if (gameManager.gameState == GameManager.GameState.MENU)
-        {
-            playerInput.Disable();
-            movementState = MovementState.Paused;
-            Time.timeScale = 0;
-            Cursor.lockState = CursorLockMode.Confined;
-            Cursor.visible = true;
+                //Events
+                EventChecker();
+
+                break;
+            case GameManager.GameState.MENU:
+                playerInput.Disable();
+                movementState = MovementState.Paused;
+                Time.timeScale = 0;
+                Cursor.lockState = CursorLockMode.Confined;
+                Cursor.visible = true;
+                break;
+            default:
+                break;
         }
     }
 
@@ -193,27 +224,22 @@ public class PlayerControllerScript : MonoBehaviour
     {
         wasdVector = context.ReadValue<Vector2>();
     }
-
     private void WASDcanceled(InputAction.CallbackContext context)
     {
         wasdVector = EMPTY_VECTOR;
     }
-
     private void SPACEperformed(InputAction.CallbackContext context)
     {
         if (gameManager.gameState == GameManager.GameState.GAMEPLAY && grounded) playerRigidbody.AddForce(transform.up * jumpHeight);
     }
-
     private void SHIFTstarted(InputAction.CallbackContext context)
     {
         shiftPressed = true;
     }
-
     private void SHIFTcanceled(InputAction.CallbackContext context)
     {
         shiftPressed = false;
     }
-
     private void SpeedControl()
     {
         Vector3 flatVel = new Vector3(playerRigidbody.velocity.x, 0f, playerRigidbody.velocity.z);
@@ -231,7 +257,6 @@ public class PlayerControllerScript : MonoBehaviour
         }
         rigidBodyVelocity = playerRigidbody.velocity;
     }
-
     private void MovePlayer()
     {
         grounded = Physics.Raycast(playerTransform.position + new Vector3(0f, playerHeight * 0.5f, 0f), Vector3.down, playerHeight + playerJumpOffset, groundLayer);
@@ -277,7 +302,6 @@ public class PlayerControllerScript : MonoBehaviour
             //Debug.Log("Not holding any item");
         }
     }
-
     private void ONEperformed(InputAction.CallbackContext context)
     {
         //First if statement checks if item is already equiped and then it will unequip it
@@ -404,7 +428,6 @@ public class PlayerControllerScript : MonoBehaviour
             }
         }
     }
-
     public int getHeldItemSlot()
     {
         if (heldItem == null)
@@ -427,7 +450,6 @@ public class PlayerControllerScript : MonoBehaviour
             return 404;
         }
     }
-
     private bool inventoryFull()
     {
         foreach (int id in inventoryManager.inventory)
@@ -439,7 +461,6 @@ public class PlayerControllerScript : MonoBehaviour
         }
         return true;
     }
-
     private int getNextInventorySlot()
     {
         int count = 0;
@@ -453,7 +474,6 @@ public class PlayerControllerScript : MonoBehaviour
         }
         return 404;
     }
-
     private int itemsInInventory()
     {
         int counter = 0;
@@ -466,7 +486,6 @@ public class PlayerControllerScript : MonoBehaviour
         }
         return counter;
     }
-
     private GameObject ItemHoverOver()
     {
         RaycastHit hit;
@@ -490,14 +509,12 @@ public class PlayerControllerScript : MonoBehaviour
             return null;
         }
     }
-
     private void UpdateInventoryItems()
     {
         inventoryItem1 = itemManager.getItem(inventoryManager.getSlotItem(0));
         inventoryItem2 = itemManager.getItem(inventoryManager.getSlotItem(1));
         inventoryItem3 = itemManager.getItem(inventoryManager.getSlotItem(2));
     }
-
     private void EPerformed(InputAction.CallbackContext context)
     {
         if (hoverItem != null)
@@ -522,7 +539,6 @@ public class PlayerControllerScript : MonoBehaviour
             }
         }
     }
-
     private void RPerformed(InputAction.CallbackContext context)
     {
         if (hoverItem != null)
@@ -551,7 +567,6 @@ public class PlayerControllerScript : MonoBehaviour
             }
         }
     }
-
     private void GPerformed(InputAction.CallbackContext context)
     {
         int slot = getHeldItemSlot();
@@ -568,7 +583,7 @@ public class PlayerControllerScript : MonoBehaviour
         }
     }
 
-    //UI Interactions
+    //UI
     private void ESCPressed(InputAction.CallbackContext context)
     {
         if (gameManager.gameState == GameManager.GameState.GAMEPLAY)
@@ -580,93 +595,136 @@ public class PlayerControllerScript : MonoBehaviour
             gameManager.setGameState(GameManager.GameState.GAMEPLAY);
         }
     }
-
     private void PPerformed(InputAction.CallbackContext context)
     {
+        //Currently debug button edit later
+
         takeDamage(8);
     }
-
     public void takeDamage(float damage)
     {
         health -= damage;
-
+        AddEvent(Event.tookDamage, tookDamageEventTime);
     }
-
     private void healthCheck()
     {
         int healthState = (int) (health + 20)/ 20;
 
-        switch (healthState){
-            case 6:
-                bloodSplats[0].GetComponent<Image>().enabled = false;
-                bloodSplats[1].GetComponent<Image>().enabled = false;
-                bloodSplats[2].GetComponent<Image>().enabled = false;
-                bloodSplats[3].GetComponent<Image>().enabled = false;
-
-                vignette.color.Override(new Color(0.08f, 0.08f, 0.08f, 1f));
-                vignette.intensity.Override(0.23f);
-                break;
-            case 5:
-                bloodSplats[0].GetComponent<Image>().enabled = false;
-                bloodSplats[1].GetComponent<Image>().enabled = false;
-                bloodSplats[2].GetComponent<Image>().enabled = false;
-                bloodSplats[3].GetComponent<Image>().enabled = false;
-
-                vignette.color.Override(new Color(0.08f, 0.08f, 0.08f, 1f));
-                vignette.intensity.Override(0.23f);
-                break;
-            case 4:
-                bloodSplats[0].GetComponent<Image>().enabled = true;
-                bloodSplats[1].GetComponent<Image>().enabled = false;
-                bloodSplats[2].GetComponent<Image>().enabled = false;
-                bloodSplats[3].GetComponent<Image>().enabled = false;
-
-                healthVignetteSetter();
-                break;
-            case 3:
-                bloodSplats[0].GetComponent<Image>().enabled = true;
-                bloodSplats[1].GetComponent<Image>().enabled = true;
-                bloodSplats[2].GetComponent<Image>().enabled = false;
-                bloodSplats[3].GetComponent<Image>().enabled = false;
-
-                healthVignetteSetter();
-                break;
-            case 2:
-                bloodSplats[0].GetComponent<Image>().enabled = true;
-                bloodSplats[1].GetComponent<Image>().enabled = true;
-                bloodSplats[2].GetComponent<Image>().enabled = true;
-                bloodSplats[3].GetComponent<Image>().enabled = false;
-
-                healthVignetteSetter();
-                break;
-            case 1:
-                bloodSplats[0].GetComponent<Image>().enabled = true;
-                bloodSplats[1].GetComponent<Image>().enabled = true;
-                bloodSplats[2].GetComponent<Image>().enabled = true;
-                bloodSplats[3].GetComponent<Image>().enabled = true;
-
-                healthVignetteSetter();
-                break;
-            default:
-                bloodSplats[0].GetComponent<Image>().enabled = false;
-                bloodSplats[1].GetComponent<Image>().enabled = false;
-                bloodSplats[2].GetComponent<Image>().enabled = false;
-                bloodSplats[3].GetComponent<Image>().enabled = false;
-
-                vignette.color.Override(new Color(0f, 0f, 0f, 1f));
-                vignette.intensity.Override(100f);
-                break;
+        if (healthState <= 0)
+        {
+            bloodSplats[0].GetComponent<Image>().enabled = false;
+            bloodSplats[1].GetComponent<Image>().enabled = false;
+            bloodSplats[2].GetComponent<Image>().enabled = false;
+            bloodSplats[3].GetComponent<Image>().enabled = false;
+            vignette.color.Override(new Color(0f, 0f, 0f, 1f));
+            vignette.intensity.Override(100f);
+        }
+        else if (!tookDamageEvent) 
+        { 
+            switch (healthState)
+            {
+                case 4:
+                    bloodSplats[0].GetComponent<Image>().enabled = true;
+                    bloodSplats[1].GetComponent<Image>().enabled = false;
+                    bloodSplats[2].GetComponent<Image>().enabled = false;
+                    bloodSplats[3].GetComponent<Image>().enabled = false;
+                    healthVignetteSetter();
+                    break;
+                case 3:
+                    bloodSplats[0].GetComponent<Image>().enabled = true;
+                    bloodSplats[1].GetComponent<Image>().enabled = true;
+                    bloodSplats[2].GetComponent<Image>().enabled = false;
+                    bloodSplats[3].GetComponent<Image>().enabled = false;
+                    healthVignetteSetter();
+                    break;
+                case 2:
+                    bloodSplats[0].GetComponent<Image>().enabled = true;
+                    bloodSplats[1].GetComponent<Image>().enabled = true;
+                    bloodSplats[2].GetComponent<Image>().enabled = true;
+                    bloodSplats[3].GetComponent<Image>().enabled = false;
+                    healthVignetteSetter();
+                    break;
+                case 1:
+                    bloodSplats[0].GetComponent<Image>().enabled = true;
+                    bloodSplats[1].GetComponent<Image>().enabled = true;
+                    bloodSplats[2].GetComponent<Image>().enabled = true;
+                    bloodSplats[3].GetComponent<Image>().enabled = true;
+                    healthVignetteSetter();
+                    break;
+                case 0:
+                    bloodSplats[0].GetComponent<Image>().enabled = false;
+                    bloodSplats[1].GetComponent<Image>().enabled = false;
+                    bloodSplats[2].GetComponent<Image>().enabled = false;
+                    bloodSplats[3].GetComponent<Image>().enabled = false;
+                    vignette.color.Override(new Color(0f, 0f, 0f, 1f));
+                    vignette.intensity.Override(100f);
+                    break;
+                default:
+                    bloodSplats[0].GetComponent<Image>().enabled = false;
+                    bloodSplats[1].GetComponent<Image>().enabled = false;
+                    bloodSplats[2].GetComponent<Image>().enabled = false;
+                    bloodSplats[3].GetComponent<Image>().enabled = false;
+                    vignette.color.Override(new Color(0.08f, 0.08f, 0.08f, 1f));
+                    vignette.intensity.Override(0.23f);
+                    break;
+            }
         }
     }
-
     private void healthVignetteSetter()
     {
         float healthIntensity = 1 - (health / 80);
-        float maxRedColorValue = 3f;
-        float minRedColorValue = 1f;
-        float maxIntensity = 3f;
-        float minIntensity = 0.5f;
         vignette.color.Override(new Color(healthIntensity * (maxRedColorValue - minRedColorValue) + minRedColorValue, 0f, 0f, 1f));
         vignette.intensity.Override(healthIntensity * (maxIntensity - minIntensity) + minIntensity);
+    }
+
+    //Events
+    private void EventChecker()
+    {
+        foreach (int id in activeEvents.Keys)
+        {
+            eventTimers[id] -= Time.deltaTime;
+            if (eventTimers[id] <= 0)
+            {
+                EventHandeler(id, false);
+                inactiveEvents.Add(id);
+            } else
+            {
+                EventHandeler(id, true);
+            }
+        }
+        foreach (int id in inactiveEvents)
+        {
+            activeEvents.Remove(id);
+            eventTimers.Remove(id);
+        }
+        inactiveEvents = new List<int>();
+    }
+    private void EventHandeler(int id, bool active){
+        switch (activeEvents[id], active)
+        {
+            case (Event.tookDamage, true):
+                if (health > 0)
+                {
+                    tookDamageEvent = true;
+                    float healthIntensity = 1 - (health / maxHealth);
+                    if (healthIntensity < 0) healthIntensity = 0;
+                    float timeIntensity = (0.5f - Mathf.Abs(eventTimers[id] / tookDamageEventTime - 0.5f)) * 2f;
+                    vignette.color.Override(new Color(timeIntensity * (tookDamageRedColor) + (healthIntensity * (maxRedColorValue - minRedColorValue) + minRedColorValue), 0f, 0f, 1f));
+                    vignette.intensity.Override(timeIntensity * (tookDamageIntensity) + (healthIntensity * (maxIntensity - minIntensity) + minIntensity));
+                }
+                break;
+            case (Event.tookDamage, false):
+                tookDamageEvent = false;
+                break;
+            default:
+                Debug.LogFormat("Error: {0} not added to EventHandeler", activeEvents[id]);
+                break;
+        }
+    }
+    private void AddEvent(Event evant, float time)
+    {
+        activeEvents[eventIds] = evant;
+        eventTimers[eventIds] = time;
+        eventIds++;
     }
 }

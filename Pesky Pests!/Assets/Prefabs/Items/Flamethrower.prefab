@@ -4952,6 +4952,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firing: 0
+  range: 0
+  damagePerSecond: 0
 --- !u!331 &5203051001366071804
 SpriteMask:
   m_ObjectHideFlags: 0

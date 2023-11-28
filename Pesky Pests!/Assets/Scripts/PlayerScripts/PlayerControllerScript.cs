@@ -2,7 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using TMPro;
+using UnityEngine.UI;
 
 public class PlayerControllerScript : MonoBehaviour
 {
@@ -16,7 +19,11 @@ public class PlayerControllerScript : MonoBehaviour
     private InventoryManager inventoryManager;
     private Transform playerCameraTransform;
     private ItemManager itemManager;
-    
+
+    [Header("PostProcessing")]
+    VolumeProfile volumeProfile;
+    Vignette vignette;
+
     [Header("Movement")]
     public Vector2 wasdVector;
     public Vector3 moveDirection;
@@ -49,6 +56,7 @@ public class PlayerControllerScript : MonoBehaviour
     [Header("GUI")]
     public TextMeshProUGUI interactText;
     public TextMeshProUGUI replaceText;
+    private GameObject[] bloodSplats;
 
     [Header("Stats")]
     public float health;
@@ -73,6 +81,10 @@ public class PlayerControllerScript : MonoBehaviour
         gameManager = GameObject.FindFirstObjectByType<GameManager>();
         inventoryManager = gameObject.GetComponent<InventoryManager>();
         playerCameraTransform = GameObject.FindGameObjectWithTag("MainCamera").transform;
+
+        volumeProfile = GameObject.FindGameObjectWithTag("GlobalVolume").GetComponent<Volume>().profile;
+        if (!volumeProfile) throw new System.NullReferenceException(nameof(UnityEngine.Rendering.VolumeProfile));
+        if (!volumeProfile.TryGet(out vignette)) throw new System.NullReferenceException(nameof(vignette));
 
         groundLayer = LayerMask.GetMask("GroundLayer");
         itemLayer = LayerMask.GetMask("Item");
@@ -106,6 +118,9 @@ public class PlayerControllerScript : MonoBehaviour
         playerInput.PlayerActions.R.performed += RPerformed;
         playerInput.PlayerActions.G.performed += GPerformed;
 
+        //For Debug
+        playerInput.PlayerActions.P.performed += PPerformed;
+
         //Player UI Input
         playerInput.UI.Esc.performed += ESCPressed;
 
@@ -127,6 +142,12 @@ public class PlayerControllerScript : MonoBehaviour
     private void Start()
     {
         itemManager = ItemManager.instance;
+
+        bloodSplats = GameObject.FindGameObjectsWithTag("BloodSplat");
+        foreach (GameObject bloodSplat in bloodSplats)
+        {
+            bloodSplat.GetComponent<Image>().enabled = false;
+        }
     }
 
     private void Update()
@@ -154,6 +175,8 @@ public class PlayerControllerScript : MonoBehaviour
 
             //UI
             UpdateInventoryItems();
+
+            healthCheck();
             
         } else if (gameManager.gameState == GameManager.GameState.MENU)
         {
@@ -166,7 +189,6 @@ public class PlayerControllerScript : MonoBehaviour
     }
 
     //Movement
-
     private void WASDperformed(InputAction.CallbackContext context)
     {
         wasdVector = context.ReadValue<Vector2>();
@@ -559,9 +581,92 @@ public class PlayerControllerScript : MonoBehaviour
         }
     }
 
+    private void PPerformed(InputAction.CallbackContext context)
+    {
+        takeDamage(8);
+    }
+
     public void takeDamage(float damage)
     {
         health -= damage;
 
+    }
+
+    private void healthCheck()
+    {
+        int healthState = (int) (health + 20)/ 20;
+
+        switch (healthState){
+            case 6:
+                bloodSplats[0].GetComponent<Image>().enabled = false;
+                bloodSplats[1].GetComponent<Image>().enabled = false;
+                bloodSplats[2].GetComponent<Image>().enabled = false;
+                bloodSplats[3].GetComponent<Image>().enabled = false;
+
+                vignette.color.Override(new Color(0.08f, 0.08f, 0.08f, 1f));
+                vignette.intensity.Override(0.23f);
+                break;
+            case 5:
+                bloodSplats[0].GetComponent<Image>().enabled = false;
+                bloodSplats[1].GetComponent<Image>().enabled = false;
+                bloodSplats[2].GetComponent<Image>().enabled = false;
+                bloodSplats[3].GetComponent<Image>().enabled = false;
+
+                vignette.color.Override(new Color(0.08f, 0.08f, 0.08f, 1f));
+                vignette.intensity.Override(0.23f);
+                break;
+            case 4:
+                bloodSplats[0].GetComponent<Image>().enabled = true;
+                bloodSplats[1].GetComponent<Image>().enabled = false;
+                bloodSplats[2].GetComponent<Image>().enabled = false;
+                bloodSplats[3].GetComponent<Image>().enabled = false;
+
+                healthVignetteSetter();
+                break;
+            case 3:
+                bloodSplats[0].GetComponent<Image>().enabled = true;
+                bloodSplats[1].GetComponent<Image>().enabled = true;
+                bloodSplats[2].GetComponent<Image>().enabled = false;
+                bloodSplats[3].GetComponent<Image>().enabled = false;
+
+                healthVignetteSetter();
+                break;
+            case 2:
+                bloodSplats[0].GetComponent<Image>().enabled = true;
+                bloodSplats[1].GetComponent<Image>().enabled = true;
+                bloodSplats[2].GetComponent<Image>().enabled = true;
+                bloodSplats[3].GetComponent<Image>().enabled = false;
+
+                healthVignetteSetter();
+                break;
+            case 1:
+                bloodSplats[0].GetComponent<Image>().enabled = true;
+                bloodSplats[1].GetComponent<Image>().enabled = true;
+                bloodSplats[2].GetComponent<Image>().enabled = true;
+                bloodSplats[3].GetComponent<Image>().enabled = true;
+
+                healthVignetteSetter();
+                break;
+            default:
+                bloodSplats[0].GetComponent<Image>().enabled = false;
+                bloodSplats[1].GetComponent<Image>().enabled = false;
+                bloodSplats[2].GetComponent<Image>().enabled = false;
+                bloodSplats[3].GetComponent<Image>().enabled = false;
+
+                vignette.color.Override(new Color(0f, 0f, 0f, 1f));
+                vignette.intensity.Override(100f);
+                break;
+        }
+    }
+
+    private void healthVignetteSetter()
+    {
+        float healthIntensity = 1 - (health / 80);
+        float maxRedColorValue = 3f;
+        float minRedColorValue = 1f;
+        float maxIntensity = 3f;
+        float minIntensity = 0.5f;
+        vignette.color.Override(new Color(healthIntensity * (maxRedColorValue - minRedColorValue) + minRedColorValue, 0f, 0f, 1f));
+        vignette.intensity.Override(healthIntensity * (maxIntensity - minIntensity) + minIntensity);
     }
 }

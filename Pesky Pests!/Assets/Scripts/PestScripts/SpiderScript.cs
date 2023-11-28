@@ -44,6 +44,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
     private Vector3 lastSeenItemLocation = new Vector3(999f, 999f, 999f);
     public float distanceToStalk;
     public float distanceToLastPlayerSpot;
+    public float distanceToAttack;
     private int targetPatrolPoint;
     private GameObject[] lightObjects;
 
@@ -52,6 +53,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
     public float spiderSpeed;
     public float spiderRunSpeed;
     public float spiderDefaultSpeed;
+    public float damagePerSecond;
 
     [Header("Debuffs")]
     public bool onFire;
@@ -93,6 +95,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
         gameManager = GameManager.instance;
 
         distanceToStalk = 50f;
+        distanceToAttack = 8f;
 
         onAlert = false;
 
@@ -204,9 +207,24 @@ public class SpiderScript : MonoBehaviour, PestInterface
                 checkVision();
                 spiderSpeed = spiderRunSpeed;
                 moveTowards(lastSeenPlayerLocation);
+                if (Vector3.Distance(transform.position, playerMesh.position) < distanceToAttack)
+                {
+                    TransitionState(PestInterface.State.Attacking);
+                }
                 break;
             case PestInterface.State.Attacking:
-
+                checkLights();
+                checkVision();
+                spiderSpeed = spiderRunSpeed;
+                moveTowards(lastSeenPlayerLocation);
+                if (Vector3.Distance(transform.position, playerMesh.position) > distanceToAttack)
+                {
+                    TransitionState(PestInterface.State.Chasing);
+                } 
+                else
+                {
+                    playerObject.GetComponent<PlayerControllerScript>().takeDamage(damagePerSecond * Time.deltaTime);
+                }
                 break;
             case PestInterface.State.Running:
 
@@ -232,15 +250,14 @@ public class SpiderScript : MonoBehaviour, PestInterface
             case PestInterface.State.Stalking:
                 state = PestInterface.State.Stalking;
                 makeEyesBright(true);
-                stopMoving();
                 break;
             case PestInterface.State.Chasing:
                 state = PestInterface.State.Chasing;
                 makeEyesBright(true);
-                stopMoving();
                 break;
             case PestInterface.State.Attacking:
-
+                state = PestInterface.State.Attacking;
+                makeEyesBright(true);
                 break;
             case PestInterface.State.Running:
 

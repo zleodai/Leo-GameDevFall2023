@@ -11,6 +11,8 @@ TagManager:
   - GameplayGUI
   - LightObject
   - SpiderPatrolPoint
+  - BloodSplat
+  - GlobalVolume
   layers:
   - Default
   - TransparentFX

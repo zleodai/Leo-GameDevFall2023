@@ -89,4 +89,14 @@ public class GameManager : MonoBehaviour
             EscMenu.SetActive(true);
         }
     }
+
+    public void winStateMet()
+    {
+
+    }
+
+    public void playerDied()
+    {
+
+    }
 }

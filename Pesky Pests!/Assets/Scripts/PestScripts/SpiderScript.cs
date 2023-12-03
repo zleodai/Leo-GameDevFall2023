@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -53,11 +54,28 @@ public class SpiderScript : MonoBehaviour, PestInterface
     public float spiderSpeed;
     public float spiderRunSpeed;
     public float spiderDefaultSpeed;
-    public float damagePerSecond;
+    public float damagePerAttack;
+    public float attackCooldown;
 
     [Header("Debuffs")]
     public bool onFire;
     public float fireVulnurability;
+
+    [Header("Events")]
+    public Dictionary<int, Event> activeEvents;
+    public Dictionary<int, float> eventTimers;
+    //public Dictionary<Event, bool> atleastOneEventActive;
+    private int eventIds = 0;
+    public List<int> inactiveEvents;
+    public enum Event
+    {
+        tookDamage,
+        death,
+        attacking,
+        attackCooldown
+    }
+    private bool stunned;
+    private bool attacking;
 
     public PestInterface.State state;
 
@@ -82,7 +100,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
         sphereCastOffsett = -11f;
 
         spiderDefaultSpeed = 4f;
-        spiderRunSpeed = 8f;
+        spiderRunSpeed = 6.5f;
         spiderSpeed = spiderDefaultSpeed;
 
         health = 100f;
@@ -95,21 +113,37 @@ public class SpiderScript : MonoBehaviour, PestInterface
         gameManager = GameManager.instance;
 
         distanceToStalk = 50f;
-        distanceToAttack = 8f;
+        distanceToAttack = 6f;
+
+        damagePerAttack = 20f;
+        attackCooldown = 2f;
 
         onAlert = false;
 
         onFire = false;
         fireVulnurability = 2.5f;
+        stunned = false;
 
         lightObjects = GameObject.FindGameObjectsWithTag("LightObject");
+
+        //Events
+
+        activeEvents = new Dictionary<int, Event>();
+        eventTimers = new Dictionary<int, float>();
+        inactiveEvents = new List<int>();
+        /*atleastOneEventActive = new Dictionary<Event, bool>();
+        var eventTypes = Enum.GetValues(typeof(Event));
+        foreach (Event evant in eventTypes)
+        {
+            atleastOneEventActive[evant] = false;
+        }*/
 
         GameObject[] patrolPointObjects = GameObject.FindGameObjectsWithTag("SpiderPatrolPoint");
         patrolPoints = new Vector3[patrolPointObjects.Length];
         int index;
         foreach (GameObject obj in patrolPointObjects)
         {
-            index = Random.Range(0, patrolPointObjects.Length);
+            index = UnityEngine.Random.Range(0, patrolPointObjects.Length);
             patrolPoints[index] = obj.transform.position;
         }
 
@@ -128,6 +162,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
                     TransitionState(PestInterface.State.Idle);
                 }
                 StateHandeler();
+                EventChecker();
                 break;
             default:
                 TransitionState(PestInterface.State.Paused);
@@ -205,7 +240,13 @@ public class SpiderScript : MonoBehaviour, PestInterface
             case PestInterface.State.Chasing:
                 checkLights();
                 checkVision();
-                spiderSpeed = spiderRunSpeed;
+                if (stunned)
+                {
+                    spiderSpeed = spiderDefaultSpeed;
+                } else
+                {
+                    spiderSpeed = spiderRunSpeed;
+                }
                 moveTowards(lastSeenPlayerLocation);
                 if (Vector3.Distance(transform.position, playerMesh.position) < distanceToAttack)
                 {
@@ -215,15 +256,24 @@ public class SpiderScript : MonoBehaviour, PestInterface
             case PestInterface.State.Attacking:
                 checkLights();
                 checkVision();
-                spiderSpeed = spiderRunSpeed;
+                if (stunned)
+                {
+                    spiderSpeed = spiderDefaultSpeed;
+                }
+                else
+                {
+                    spiderSpeed = spiderRunSpeed;
+                }
                 moveTowards(lastSeenPlayerLocation);
                 if (Vector3.Distance(transform.position, playerMesh.position) > distanceToAttack)
                 {
                     TransitionState(PestInterface.State.Chasing);
-                } 
-                else
+                } else
                 {
-                    playerObject.GetComponent<PlayerControllerScript>().takeDamage(damagePerSecond * Time.deltaTime);
+                    if (!attacking)
+                    {
+                        AddEvent(Event.attacking, 0.5f);
+                    }
                 }
                 break;
             case PestInterface.State.Running:
@@ -270,6 +320,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
         health -= damage;
         seenPlayer = true;
         lastSeenPlayerLocation = playerMesh.position;
+        AddEvent(Event.tookDamage, 0.1f);
         TransitionState(PestInterface.State.Chasing);
     }
 
@@ -326,21 +377,21 @@ public class SpiderScript : MonoBehaviour, PestInterface
                         if (Physics.SphereCast(transform.position + orientation.forward.normalized * sphereCastOffset, sphereForDetectingPlayerRadius, orientation.forward, out hit, lightSightDistance, playerLayer))
                         {
                             playerFound(playerHit.point);
-                            Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.red, 0.1f);
+                            //Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.red, 0.1f);
                         }
                         else if (Physics.SphereCast(transform.position - orientation.forward.normalized * sphereCastOffsett, sphereForDetectingPlayerRadius, -orientation.forward, out hit, lightSightDistance, playerLayer))
                         {
-                            Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.yellow, 0.1f);
+                            //Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.yellow, 0.1f);
                         }
                         else if (hitPlayerDistance <= autoSenseDistance)
                         {
                             playerFound(playerMesh.position);
-                            Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.green, 0.1f);
+                            //Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.green, 0.1f);
                         }
                         if (hitPlayerDistance <= generalAwarenessDistance)
                         {
                             playerFound(playerMesh.position);
-                            Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.gray, 0.1f);
+                            //Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.gray, 0.1f);
                         }
                     }
                     else if (hitItem && hitGroundDistance > hitItemDistance)
@@ -349,12 +400,12 @@ public class SpiderScript : MonoBehaviour, PestInterface
                         if (Physics.SphereCast(transform.position + orientation.forward.normalized * sphereCastOffset, sphereForDetectingPlayerRadius, orientation.forward, out hit, lightSightDistance, itemLayer))
                         {
                             itemFound(light, itemHit.point);
-                            Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.blue, 0.1f);
+                            //Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.blue, 0.1f);
                         }
                         else if (hitPlayerDistance <= autoSenseDistance)
                         {
                             itemFound(light, light.transform.position);
-                            Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.gray, 0.1f);
+                            //Debug.DrawRay(transform.position, vectorTowardsLight.normalized * lightSightDistance, Color.gray, 0.1f);
                         }
                     }
                 }
@@ -390,12 +441,12 @@ public class SpiderScript : MonoBehaviour, PestInterface
         if (hitPlayer && hitGroundDistance > hitplayerSphereCastDistance)
         {
             playerFound(sphereCastPlayerHit.point);
-            Debug.DrawRay(transform.position, vectorTowardsPlayer.normalized * forwardVisionDistance, Color.white, 0.1f);
+            //Debug.DrawRay(transform.position, vectorTowardsPlayer.normalized * forwardVisionDistance, Color.white, 0.1f);
         }
         else if (Vector3.Distance(playerMesh.position, transform.position) <= generalAwarenessDistance && hitGroundDistance > hitPlayerDistance)
         {
             playerFound(playerMesh.position);
-            Debug.DrawRay(transform.position, vectorTowardsPlayer.normalized * forwardVisionDistance, Color.gray, 0.1f);
+            //Debug.DrawRay(transform.position, vectorTowardsPlayer.normalized * forwardVisionDistance, Color.gray, 0.1f);
         }
     }
 
@@ -417,6 +468,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
         seenPlayer = false;
         targetObject = null;
         TransitionState(PestInterface.State.Idle);
+        makeEyesBright(false);
     }
 
     public void itemFound(GameObject obj, Vector3 itemLocation)
@@ -506,5 +558,70 @@ public class SpiderScript : MonoBehaviour, PestInterface
         makeEyesBright(false);
         stopMoving();
         Destroy(this);
+    }
+    // Fix this pls
+    private void EventChecker()
+    {
+        foreach (int id in activeEvents.Keys)
+        {
+            eventTimers[id] -= Time.deltaTime;
+            if (eventTimers[id] <= 0)
+            {
+                EventHandeler(id, false);
+                inactiveEvents.Add(id);
+            }
+            else
+            {
+                EventHandeler(id, true);
+            }
+        }
+        foreach (int id in inactiveEvents)
+        {
+            activeEvents.Remove(id);
+            eventTimers.Remove(id);
+        }
+        inactiveEvents.Clear();
+    }
+    private void EventHandeler(int id, bool active)
+    {
+        switch (activeEvents[id], active)
+        {
+            case (Event.tookDamage, true):
+                if (health > 0)
+                {
+                    stunned = true;
+                }
+                break;
+            case (Event.tookDamage, false):
+                stunned = false;
+                break;
+            case (Event.attacking, true):
+
+                if (health > 0 && attacking == false)
+                {
+                    attacking = true;
+                }
+                break;
+            case (Event.attacking, false):
+                if (health > 0 && attacking == true)
+                {
+                    attacking = false;
+                    playerObject.GetComponent<PlayerControllerScript>().takeDamage(damagePerAttack);
+                    Vector3 vectorTowardsPlayer = playerMesh.position - transform.position;
+                    Debug.DrawRay(transform.position, vectorTowardsPlayer.normalized * forwardVisionDistance, Color.red, 1f);
+
+                    AddEvent(Event.attackCooldown, attackCooldown);
+                }
+                break;
+            default:
+                Debug.LogFormat("Error: {0} not added to EventHandeler", activeEvents[id]);
+                break; 
+        }
+    }
+    private void AddEvent(Event evant, float time)
+    {
+        activeEvents[eventIds] = evant;
+        eventTimers[eventIds] = time;
+        eventIds++;
     }
 }

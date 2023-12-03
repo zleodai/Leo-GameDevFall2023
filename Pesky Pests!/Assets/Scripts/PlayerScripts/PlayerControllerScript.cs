@@ -112,7 +112,7 @@ public class PlayerControllerScript : MonoBehaviour
         moveSpeed = 1.75f;
         airMultiplier = 1f;
         groundDrag = 0.25f;
-        runMult = 2.5f;
+        runMult = 2.75f;
         hoverOverItemLength = 5f;
 
         //Debug for if public variables not assigned
@@ -618,6 +618,7 @@ public class PlayerControllerScript : MonoBehaviour
             bloodSplats[3].GetComponent<Image>().enabled = false;
             vignette.color.Override(new Color(0f, 0f, 0f, 1f));
             vignette.intensity.Override(100f);
+            gameManager.playerDied();
         }
         else if (!tookDamageEvent) 
         { 

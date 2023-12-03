@@ -14,13 +14,17 @@ public class GameManager : MonoBehaviour
     public float EscMenuButtonPopSize;
     public GameObject ControlsMenu;
     public GameObject GameplayGUI;
+    public GameObject WinGUI;
+    public GameObject LoseGUI;
 
     public enum GameState 
     {
         MAIN_MENU,
         GAMEPLAY,
         PAUSED,
-        MENU
+        MENU,
+        WON,
+        LOSE
     }
 
     public GameState gameState;
@@ -52,6 +56,14 @@ public class GameManager : MonoBehaviour
         {
             GameplayGUI = GameObject.FindGameObjectWithTag("GameplayGUI");
         }
+        if (WinGUI == null)
+        {
+            WinGUI = GameObject.FindGameObjectWithTag("WinGUI");
+        }
+        if (LoseGUI == null)
+        {
+            LoseGUI = GameObject.FindGameObjectWithTag("LoseGUI");
+        }
     }
 
     private void Start()
@@ -68,12 +80,32 @@ public class GameManager : MonoBehaviour
             GameplayGUI.SetActive(true);
             EscMenu.SetActive(false);
             ControlsMenu.SetActive(false);
+            WinGUI.SetActive(false);
+            LoseGUI.SetActive(false);
         }
         else if (gameState == GameState.MENU)
         {
             GameplayGUI.SetActive(false);
             EscMenu.SetActive(true);
             ControlsMenu.SetActive(false);
+            WinGUI.SetActive(false);
+            LoseGUI.SetActive(false);
+        }
+        else if (gameState == GameState.WON)
+        {
+            GameplayGUI.SetActive(false);
+            EscMenu.SetActive(false);
+            ControlsMenu.SetActive(false);
+            WinGUI.SetActive(true);
+            LoseGUI.SetActive(false);
+        }
+        else if (gameState == GameState.LOSE)
+        {
+            GameplayGUI.SetActive(false);
+            EscMenu.SetActive(false);
+            ControlsMenu.SetActive(false);
+            WinGUI.SetActive(false);
+            LoseGUI.SetActive(true);
         }
     }
 
@@ -92,11 +124,11 @@ public class GameManager : MonoBehaviour
 
     public void winStateMet()
     {
-
+        setGameState(GameState.WON);
     }
 
     public void playerDied()
     {
-
+        setGameState(GameState.LOSE);
     }
 }

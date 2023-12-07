@@ -15,8 +15,6 @@ public class SpiderScript : MonoBehaviour, PestInterface
     private NavMeshAgent navMeshAgent;
     public Material dimSpiderEyeMaterial;
     public Material brightSpiderEyeMaterial;
-    private MeshRenderer[] spiderEyesList;
-    private ParticleSystem[] fires;
 
     [Header("Layers")]
     private LayerMask playerLayer;
@@ -88,9 +86,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
         playerLayer = LayerMask.GetMask("PlayerLayer");
         itemLayer = LayerMask.GetMask("Item");
         groundLayer = LayerMask.GetMask("GroundLayer");
-        fires = GetComponentsInChildren<ParticleSystem>();
 
-        spiderEyesList = transform.Find("SpiderEyes").gameObject.GetComponentsInChildren<MeshRenderer>();
         makeEyesBright(false);
 
         lightSightDistance = 100f;
@@ -100,7 +96,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
         sphereCastOffsett = -11f;
 
         spiderDefaultSpeed = 4f;
-        spiderRunSpeed = 6.5f;
+        spiderRunSpeed = 7.5f;
         spiderSpeed = spiderDefaultSpeed;
 
         health = 100f;
@@ -111,6 +107,10 @@ public class SpiderScript : MonoBehaviour, PestInterface
 
         state = PestInterface.State.Idle;
         gameManager = GameManager.instance;
+        if (gameManager == null)
+        {
+            gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        }
 
         distanceToStalk = 50f;
         distanceToAttack = 6f;
@@ -154,6 +154,10 @@ public class SpiderScript : MonoBehaviour, PestInterface
     {
         distanceToLastPlayerSpot = Vector3.Distance(transform.position, lastSeenPlayerLocation);
         navMeshAgent.speed = spiderSpeed;
+        if (gameManager == null)
+        {
+            Debug.Log("Game manager not found??");
+        }
         switch (gameManager.gameState)
         {
             case GameManager.GameState.GAMEPLAY:
@@ -495,18 +499,11 @@ public class SpiderScript : MonoBehaviour, PestInterface
     {
         if (bright)
         {
-            foreach (MeshRenderer eye in spiderEyesList)
-            {
-                eye.material = brightSpiderEyeMaterial;
-            }
         }
         else
         {
-            foreach (MeshRenderer eye in spiderEyesList)
-            {
-                eye.material = dimSpiderEyeMaterial;
-            }
         }
+        //Depricated
     }
 
     private void alertSpider()
@@ -527,17 +524,10 @@ public class SpiderScript : MonoBehaviour, PestInterface
     {
         if (enable)
         {
-            foreach (ParticleSystem fire in fires)
-            {
-                fire.gameObject.SetActive(true);
-            }
         } else
         {
-            foreach (ParticleSystem fire in fires)
-            {
-                fire.gameObject.SetActive(false);
-            }
         }
+        //Depricated
     }
 
     private void fireCheck()

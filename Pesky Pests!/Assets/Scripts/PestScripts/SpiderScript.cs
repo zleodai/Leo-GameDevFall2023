@@ -580,6 +580,10 @@ public class SpiderScript : MonoBehaviour, PestInterface
         eyes.enabled = false;
 
         TransitionState(PestInterface.State.Dead);
+
+        BoxCollider boxCollider = transform.Find("Spider").Find("Armature").gameObject.GetComponent<BoxCollider>();
+        boxCollider.enabled = false;
+
         Destroy(this);
     }
     // Fix this pls

@@ -112,7 +112,7 @@ public class PlayerControllerScript : MonoBehaviour
         moveSpeed = 4f;
         airMultiplier = 1f;
         groundDrag = 0.25f;
-        runMult = 2.5f;
+        runMult = 2.75f;
         hoverOverItemLength = 5f;
 
         //Debug for if public variables not assigned

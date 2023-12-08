@@ -45,14 +45,12 @@ public class FlamethrowerScript : MonoBehaviour, ItemInterface
 
     public void interact()
     {
-        if (!firing)
-        {
-            firing = true;
-        }
-        else
-        {
-            firing = false;
-        }
+        firing = true;
+    }
+
+    public void interactcancel()
+    {
+        firing = false;
     }
 
     public void updateState()
@@ -82,7 +80,25 @@ public class FlamethrowerScript : MonoBehaviour, ItemInterface
 
             if (hitEnemy && hitGroundDistance > hitEnemyDistance)
             {
-                PestInterface enemyScript = enemyHit.collider.gameObject.transform.parent.gameObject.GetComponent<PestInterface>();
+                
+                PestInterface enemyScript = null;
+                GameObject objectLayer = enemyHit.collider.gameObject;
+                int counter = 1;
+                while (enemyScript == null && counter < 8)
+                {
+                    PestInterface pestypest = objectLayer.GetComponent<PestInterface>();
+                    if (pestypest != null)
+                    {
+                        enemyScript = pestypest;
+                    }
+                    Transform parentTransform = objectLayer.transform.parent;
+                    if (parentTransform != null)
+                    {
+                        objectLayer = parentTransform.gameObject;
+                    }
+
+                    counter += 1;
+                }
                 if (enemyScript != null)
                 {
                     enemyScript.AddDebuff(PestInterface.Debuff.OnFire);

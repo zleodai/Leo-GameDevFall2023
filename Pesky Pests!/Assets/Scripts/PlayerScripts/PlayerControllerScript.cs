@@ -106,13 +106,13 @@ public class PlayerControllerScript : MonoBehaviour
         itemLayer = LayerMask.GetMask("Item");
 
         //Initalize values
-        playerHeight = 2f;
+        playerHeight = 4f;
         playerJumpOffset = 0.3f;
         jumpHeight = 175f;
-        moveSpeed = 1.75f;
+        moveSpeed = 4f;
         airMultiplier = 1f;
         groundDrag = 0.25f;
-        runMult = 2.75f;
+        runMult = 2.5f;
         hoverOverItemLength = 5f;
 
         //Debug for if public variables not assigned
@@ -161,7 +161,8 @@ public class PlayerControllerScript : MonoBehaviour
         playerInput.PlayerMovement.Shift.canceled += SHIFTcanceled;
 
         //Player Action Input
-        playerInput.PlayerActions.LeftClick.performed += CLICKperformed;
+        playerInput.PlayerActions.LeftClick.started += CLICKstarted;
+        playerInput.PlayerActions.LeftClick.canceled += CLICKcanceled;
         playerInput.PlayerActions._1.performed += ONEperformed;
         playerInput.PlayerActions._2.performed += TWOperformed;
         playerInput.PlayerActions._3.performed += THREEperformed;
@@ -283,7 +284,7 @@ public class PlayerControllerScript : MonoBehaviour
     }
 
     //Actions
-    private void CLICKperformed(InputAction.CallbackContext context)
+    private void CLICKstarted(InputAction.CallbackContext context)
     {
         if (heldItem != null)
         {
@@ -291,6 +292,25 @@ public class PlayerControllerScript : MonoBehaviour
             if (heldItemScript != null)
             {
                 heldItemScript.interact();
+            }
+            else
+            {
+                Debug.Log("Not holding valid item");
+            }
+        }
+        else
+        {
+            //Debug.Log("Not holding any item");
+        }
+    }
+    private void CLICKcanceled(InputAction.CallbackContext context)
+    {
+        if (heldItem != null)
+        {
+            heldItemScript = heldItem.GetComponent<ItemInterface>();
+            if (heldItemScript != null)
+            {
+                heldItemScript.interactcancel();
             }
             else
             {

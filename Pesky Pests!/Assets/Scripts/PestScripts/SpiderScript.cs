@@ -32,19 +32,19 @@ public class SpiderScript : MonoBehaviour, PestInterface
     public float generalAwarenessDistance;
 
     [Header("Memory")]
-    private bool onAlert;
+    public bool onAlert;
     public Vector3[] patrolPoints;
-    private bool seenPlayer = false;
+    public bool seenPlayer = false;
     private Vector3 defaultlastSeenLocation = new Vector3(999f, 999f, 990f);
     public Vector3 lastSeenPlayerLocation = new Vector3(999f, 999f, 990f);
     private float timeSinceSeenPlayer = 0;
     public float timeToForgetPlayer = 10;
-    private GameObject targetObject = null;
+    public GameObject targetObject = null;
     private Vector3 lastSeenItemLocation = new Vector3(999f, 999f, 999f);
     public float distanceToStalk;
     public float distanceToLastPlayerSpot;
     public float distanceToAttack;
-    private int targetPatrolPoint;
+    public int targetPatrolPoint;
     private GameObject[] lightObjects;
 
     [Header("SpiderStats")]
@@ -95,8 +95,8 @@ public class SpiderScript : MonoBehaviour, PestInterface
         sphereCastOffset = 3f;
         sphereCastOffsett = -11f;
 
-        spiderDefaultSpeed = 4f;
-        spiderRunSpeed = 7.5f;
+        spiderDefaultSpeed = 7f;
+        spiderRunSpeed = 10f;
         spiderSpeed = spiderDefaultSpeed;
 
         health = 100f;
@@ -113,7 +113,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
         }
 
         distanceToStalk = 50f;
-        distanceToAttack = 6f;
+        distanceToAttack = 4f;
 
         damagePerAttack = 20f;
         attackCooldown = 2f;
@@ -188,7 +188,12 @@ public class SpiderScript : MonoBehaviour, PestInterface
         if (state != PestInterface.State.Paused)
         {
             fireCheck();
-            if (health <= 0) deathEvent();
+            if (health <= 0) 
+            {
+                print(state);
+                print(health);
+                deathEvent();
+            }
         }
 
         switch (state)
@@ -222,16 +227,23 @@ public class SpiderScript : MonoBehaviour, PestInterface
                 else
                 {
                     Vector3 targetPosition = patrolPoints[targetPatrolPoint];
+                    //Debug.LogFormat("Target: {0},  Distance: {1}", targetPosition, Vector3.Distance(targetPosition, transform.position));
                     if (Vector3.Distance(targetPosition, transform.position) < 5f)
                     {
                         targetPatrolPoint++;
-                        stopMoving();
-                        if (targetPatrolPoint >= patrolPoints.Length)
+                        while (patrolPoints[targetPatrolPoint] != new Vector3(0f, 0f, 0f))
                         {
-                            targetPatrolPoint = 0;
+                            targetPatrolPoint++;
+                            if (targetPatrolPoint >= patrolPoints.Length)
+                            {
+                                targetPatrolPoint = 0;
+                            }
                         }
+
+                        targetPosition = patrolPoints[targetPatrolPoint];
                     }
                     moveTowards(targetPosition);
+                    navMeshAgent.enabled = true;
                 }
                 break;
             case PestInterface.State.Stalking:
@@ -283,6 +295,9 @@ public class SpiderScript : MonoBehaviour, PestInterface
             case PestInterface.State.Running:
 
                 break;
+            case PestInterface.State.Dead:
+
+                break;
         }
     }
     public void TransitionState(PestInterface.State newState)
@@ -316,6 +331,9 @@ public class SpiderScript : MonoBehaviour, PestInterface
             case PestInterface.State.Running:
 
                 break;
+            case PestInterface.State.Dead:
+                state = PestInterface.State.Dead;
+                break;
         }
     }
 
@@ -325,7 +343,6 @@ public class SpiderScript : MonoBehaviour, PestInterface
         seenPlayer = true;
         lastSeenPlayerLocation = playerMesh.position;
         AddEvent(Event.tookDamage, 0.1f);
-        TransitionState(PestInterface.State.Chasing);
     }
 
     public void AddDebuff(PestInterface.Debuff debuff)
@@ -545,8 +562,24 @@ public class SpiderScript : MonoBehaviour, PestInterface
 
     private void deathEvent()
     {
+
         makeEyesBright(false);
         stopMoving();
+
+        //Death Ragdoll
+        SpiderProceduralAnimation spd = transform.Find("Spider").GetComponent<SpiderProceduralAnimation>();
+        Transform[] legTargets = spd.legTargets;
+        Destroy(spd);
+        foreach (Transform legTarget in legTargets)
+        {
+
+            legTarget.position = legTarget.position += new Vector3(UnityEngine.Random.Range(-10.0f, 10.0f), UnityEngine.Random.Range(-10.0f, 10.0f), UnityEngine.Random.Range(-10.0f, 10.0f));
+        }
+
+        SkinnedMeshRenderer eyes = transform.Find("Spider").Find("SpiderEyes").gameObject.GetComponent<SkinnedMeshRenderer>();
+        eyes.enabled = false;
+
+        TransitionState(PestInterface.State.Dead);
         Destroy(this);
     }
     // Fix this pls

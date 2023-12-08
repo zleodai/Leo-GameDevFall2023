@@ -1,0 +1,276 @@
+fileFormatVersion: 2
+guid: 992056a1bb665bc40860071b24b49b65
+ModelImporter:
+  serializedVersion: 21300
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Barrier_Road
+    second: {fileID: 2100000, guid: 02d2ec1eb11b1b146af61d23d3336db5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Board_Message
+    second: {fileID: 2100000, guid: 46d1b8ae90b77c146badd579e1e1858a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Cabinet_Basic
+    second: {fileID: 2100000, guid: 540c55d71a0a7c74fa924939add8d8a8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Cable_Reel
+    second: {fileID: 2100000, guid: 7e940efb7914f0341893e304ac8eeb1b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Chair_Sun
+    second: {fileID: 2100000, guid: eb28b0f12df8b794cbd68dba994503d2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Control_Box
+    second: {fileID: 2100000, guid: 7e48055de0969df43b853e937018797b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Crate
+    second: {fileID: 2100000, guid: c216ae4c47d23e54994d6cca36fcd5ae, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Dartboard
+    second: {fileID: 2100000, guid: 28ae20d5e23a6ec41a61e341938bf97a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Fireplace_Tower
+    second: {fileID: 2100000, guid: 22dba41b6025f0c4fa9ad7610e9e0786, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Firepot
+    second: {fileID: 2100000, guid: 8c7292cb7b0176d43ad9640676fdad41, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Frame_Metal
+    second: {fileID: 2100000, guid: c2d4eeb4e1998e04f883bd1f270baa92, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Fridge
+    second: {fileID: 2100000, guid: 5175ef2e5f219f0429057cee13bb5d32, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Mailbox
+    second: {fileID: 2100000, guid: a43dcde7c35b9a542bc37bae5bf7c1bb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Mattress_Hard
+    second: {fileID: 2100000, guid: a1b6a93dc65aed249ac1916dec61b8b6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Mattress_Soft
+    second: {fileID: 2100000, guid: 34ed3bee2b909154c85ef400a089f840, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Pallet.001
+    second: {fileID: 2100000, guid: d9064c8b35925304b9c34574619951e2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_A
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_C
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_D
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_E
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_F
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_G
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_H
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_I
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_J
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Plank_Pile
+    second: {fileID: 2100000, guid: c323c61ad3631984087be720b15edaf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Radiator_Panel
+    second: {fileID: 2100000, guid: e3e6256e82c3b76499d9970d03496711, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Radiator_Panel_Extension
+    second: {fileID: 2100000, guid: e3e6256e82c3b76499d9970d03496711, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Retro_Radio
+    second: {fileID: 2100000, guid: 9a192741352dcd5428c6b10a1b84067b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Sign_Public_Road_Ends
+    second: {fileID: 2100000, guid: a7d8a7eaa1dd58e478e8d37c065ae73c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Sofa
+    second: {fileID: 2100000, guid: ef8df08cc3296fd47b172b0c1af59de2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Television_Retro_Frame
+    second: {fileID: 2100000, guid: 19de2ac0f6d4fea4988affad7a0d82da, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Television_Retro_Screen
+    second: {fileID: 2100000, guid: 18f15b686d46886469bce78121b9f204, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MT_Transformer_Box
+    second: {fileID: 2100000, guid: 93c55061a3faa40459e36095b2f16a5b, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 1
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

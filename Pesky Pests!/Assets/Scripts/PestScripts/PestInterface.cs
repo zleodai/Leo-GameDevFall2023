@@ -12,7 +12,8 @@ public interface PestInterface
         Stalking,
         Chasing,
         Attacking,
-        Running
+        Running,
+        Dead
     }
 
     public enum Debuff

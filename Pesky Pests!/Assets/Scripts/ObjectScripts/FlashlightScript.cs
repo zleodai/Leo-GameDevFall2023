@@ -53,6 +53,11 @@ public class FlashlightScript : MonoBehaviour, ItemInterface
         }
     }
 
+    public void interactcancel()
+    {
+        return;
+    }
+
     public void updateState()
     {
         if (state)

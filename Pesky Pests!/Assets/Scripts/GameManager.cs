@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
     [Header("Refrences")]
     private GameObject playerObject;
     private InventoryManager playerInventoryScript;
+    public GameObject spiderPrefab;
+    public Transform pestParent;
 
     [Header("UI")]
     public GameObject EscMenu;
@@ -16,6 +18,10 @@ public class GameManager : MonoBehaviour
     public GameObject GameplayGUI;
     public GameObject WinGUI;
     public GameObject LoseGUI;
+
+    [Header("Gameplay")]
+    public float timeToSpawnSpider = 30f;
+    private float counter = 0f;
 
     public enum GameState 
     {
@@ -69,6 +75,17 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         setGameState(GameState.GAMEPLAY);
+    }
+
+    private void Update()
+    {
+        counter += Time.deltaTime;
+
+        if (counter >= timeToSpawnSpider)
+        {
+            counter = 0f;
+            Instantiate(spiderPrefab, pestParent);
+        }
     }
 
     public void setGameState(GameState state)

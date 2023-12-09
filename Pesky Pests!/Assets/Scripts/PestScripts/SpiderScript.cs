@@ -190,8 +190,6 @@ public class SpiderScript : MonoBehaviour, PestInterface
             fireCheck();
             if (health <= 0) 
             {
-                print(state);
-                print(health);
                 deathEvent();
             }
         }

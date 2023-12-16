@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using RotaryHeart;
+using FMOD.Studio;
 
 public class SpiderScript : MonoBehaviour, PestInterface
 {
     [Header("Refrences")]
     private GameManager gameManager;
     private GameObject playerObject;
+    private AudioManager audioManager;
     private Transform playerMesh;
     private Transform orientation;
     private NavMeshAgent navMeshAgent;
@@ -65,6 +67,10 @@ public class SpiderScript : MonoBehaviour, PestInterface
     //public Dictionary<Event, bool> atleastOneEventActive;
     private int eventIds = 0;
     public List<int> inactiveEvents;
+
+    [Header("Audio")]
+    private EventInstance spiderWalk;
+
     public enum Event
     {
         tookDamage,
@@ -95,8 +101,8 @@ public class SpiderScript : MonoBehaviour, PestInterface
         sphereCastOffset = 3f;
         sphereCastOffsett = -11f;
 
-        spiderDefaultSpeed = 7f;
-        spiderRunSpeed = 10f;
+        spiderDefaultSpeed = 12f;
+        spiderRunSpeed = 15f;
         spiderSpeed = spiderDefaultSpeed;
 
         health = 100f;
@@ -148,6 +154,19 @@ public class SpiderScript : MonoBehaviour, PestInterface
         }
 
         targetPatrolPoint = 0;
+        while (patrolPoints[targetPatrolPoint] == Vector3.zero)
+        {
+            targetPatrolPoint++;
+            if (targetPatrolPoint >= patrolPoints.Length)
+            {
+                targetPatrolPoint = 0;
+            }
+        }
+
+        //Audio
+
+        audioManager = AudioManager.instance;
+        spiderWalk = audioManager.CreateEventInstance(audioManager.spiderWalk);
     }
 
     private void Update()
@@ -188,6 +207,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
         if (state != PestInterface.State.Paused)
         {
             fireCheck();
+            walkSound();
             if (health <= 0) 
             {
                 deathEvent();
@@ -229,7 +249,7 @@ public class SpiderScript : MonoBehaviour, PestInterface
                     if (Vector3.Distance(targetPosition, transform.position) < 5f)
                     {
                         targetPatrolPoint++;
-                        while (patrolPoints[targetPatrolPoint] != new Vector3(0f, 0f, 0f))
+                        while (patrolPoints[targetPatrolPoint] == Vector3.zero)
                         {
                             targetPatrolPoint++;
                             if (targetPatrolPoint >= patrolPoints.Length)
@@ -237,7 +257,6 @@ public class SpiderScript : MonoBehaviour, PestInterface
                                 targetPatrolPoint = 0;
                             }
                         }
-
                         targetPosition = patrolPoints[targetPatrolPoint];
                     }
                     moveTowards(targetPosition);
@@ -508,6 +527,25 @@ public class SpiderScript : MonoBehaviour, PestInterface
     public void stopMoving()
     {
         navMeshAgent.enabled = false;
+        spiderWalk.stop(STOP_MODE.ALLOWFADEOUT);
+    }
+
+    private void walkSound()
+    {
+        if (navMeshAgent.velocity != Vector3.zero)
+        {
+            PLAYBACK_STATE playbackState;
+            spiderWalk.getPlaybackState(out playbackState);
+            if (playbackState.Equals(PLAYBACK_STATE.STOPPED))
+            {
+                spiderWalk.start();
+                FMODUnity.RuntimeManager.AttachInstanceToGameObject(spiderWalk, GetComponent<Transform>(), gameObject);
+                spiderWalk.setParameterByName("pitch", 0.5f);
+            }
+        } else
+        {
+            spiderWalk.stop(STOP_MODE.ALLOWFADEOUT);
+        }
     }
 
     private void makeEyesBright(bool bright)

@@ -90,12 +90,16 @@ MonoBehaviour:
   forwardVisionSphereCast: 0
   forwardVisionDistance: 0
   generalAwarenessDistance: 0
+  onAlert: 0
   patrolPoints: []
+  seenPlayer: 0
   lastSeenPlayerLocation: {x: 999, y: 999, z: 990}
   timeToForgetPlayer: 10
+  targetObject: {fileID: 0}
   distanceToStalk: 0
   distanceToLastPlayerSpot: 0
   distanceToAttack: 0
+  targetPatrolPoint: 0
   health: 0
   spiderSpeed: 0
   spiderRunSpeed: 0
